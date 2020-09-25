@@ -1,0 +1,153 @@
+---
+title: "Dissertation Proposal"
+author: "Elizabeth Wesley"
+date: "9/25/2020"
+header-includes:
+   - \usepackage{booktabs}
+output: 
+  pdf_document:
+    number_sections: true
+bibliography: Dissertation-Proposal.bib  
+---
+
+
+# Introduction {#intro}
+
+Approximately 55\% of the global population lives in urban areas with this number expected to increase to two-thirds by 2050 [@UnitedNations2019].
+Urbanization is accompanied by a suite of surface modifications that effect the surface-energy balance, hydrological flows, and the availability of vegetation, creating distinct and varied microclimates [@Pickett2001].
+These modifications vary spatially, creating uneven landscapes of environmental externalities and benefits as well as infrastructure access.
+These spatial variations in turn affect and are effected by demographics and are often distinct along income and racial lines [@Heynan2006].
+Systematic inequalities arise from zoning practices and disinvestment and have a long historical legacy [@Wolch2014].
+These three subsystems–meteorological, physical, and social–are highly interdependent with complex feedbacks, and interact in complex ways characterized by non-linear dynamics and thresholding behaviors, operating across a variety of spatial and temporal scales [@Liu2007; @Liu2007a; @McPhearson2016]. Understanding the interactions of these subsystems is crucial to understanding cities as coupled human-natural systems, which is itself crucial to understanding the spatial variability of public health in urban areas.
+
+Urban systems are complex and incorporate disparate elements usually siloed within separate disciplines [@Bai2018]. It is inefficient to study human and natural systems separately when attempting to undestand their interactions [@Liu2007a]. Likewise, research is usually done in the abstract, without a focused eye to solving real-world problems. Research should provide usable solutions [@Liu2007a; @McPhearson2016]. Addressing these problems successfully involves transdisciplinary work that can examine urban systems as intersections of social, physical, environmental, and atmospheric systems [@Bai2018; @McPhearson2016]. Understanding urban systems is a critical first step in understanding how they may respond to climate change [@Bai2018]. If risk can be understood quanititatively it can be projected under different climate change scenarios [@McMichael2012]. Measures of public health can be used as an outcome for modelling these coupled human and natural systems.
+
+Public health can be defined as the health of entire populations, from neighborhoods to cities to countries and on [@Trochim2006]. As the world becomes increasingly urban, understanding the dynamics of public health in urban environments and how they interact with climate, the environment, and society becomes increasingly important. Public health requires transdisciplinary approaches to modelling the complex systems that interact to produce variabilities in outcomes [@Trochim2006]. Understanding the structural variability of public health across these domains can allow for better public policies [@McPhearson2016].
+
+## Weather and public health {#weather-pubhealth}
+
+It is intuitive to understand that weather has an effect on human health.
+Besides disasters like floods and tornadoes, everyday meteorological conditions effect health as well.
+Extremes of heat and cold can exacerbate existing conditions and effect cardiovascular and respiratory function and may lead to increased mortality [@ferreirabragaTimeCourseWeatherRelated2001}.
+Heat also facilitates the formation of ground-level ozone and precipitation and wind effect the severity of allergen concentrations.
+Atmospheric pressure and humidity likewise have effects on human health.
+These effects often occur at a temporal lag.
+
+[@Ayres-Sampaio2014} found that hospital admissions due to asthma were positively related to high levels of $NO_2$, low NDVI, and high temperatures, however, they examined each of these variables independently in simple linear regressions.
+Furthmore, they used seasonal averages of these variables.
+Although they attempted a spatial analysis, this consisted of simply examining the differences in relationships between municipalities rather than using a continuously variable measure of space.
+[@babinPediatricPatientAsthmarelated2007} found a positive relationship between $O_3$ and pediatric asthma but their dataset spanned only three years.
+
+## Urban infrastructure and environment {#urbenv-pubhealth}
+
+Urban infrastructure and environment vary spatially within the urban context and are likely to produce variabilities in health based on proximity to features.
+Highways and railways are major sources of pollution as are power plants and other large electrical facilities.
+Greenspace is known to reduce land surface temperature just as impervious surfaces are known to increase it.
+[@villeneuveCohortStudyRelating2012b} found that there was an inverse relationship between greenspace and mortality.
+Urban trees contribute to improved air quality by reducing air pollution concentrations [@nowakAirPollutionRemoval2006}.
+Urban core areas are effected by the urban heat island where the increased percentage of impervious surfaces elevates temperatures.
+Age and material of housing stock are also likely to impact the health of residents.
+
+## Social determinants of health {#socdet}
+
+It is well known that large disparities of health outcomes exist across socio-economic spectra, with minorities and the poor having the worst outcomes.
+These social determinants of health also vary spatially often along with the physical determinants of health present in the urban system.
+It is essential to understand how the social determinants interact with the climatic and physical systems to produce variabilities in public health vulnerability in order to prioritize the distribution of resources.
+@babinPediatricPatientAsthmarelated2007 found a logarithmic relationship between pediatric asthma-related emergency departmnet visits and the percentage of children living below the poverty level but this data was aggregated to the zip code ılevel.
+
+## Current limitations {#limits}
+
+While there are many calls for transdisciplinary and systems-based approaches to studying urban areas, few studies have actually attempted to answer the complex questions posed by urban systems.
+In particular, public health studies in this vein are even fewer.
+While some studies attempt to understand the variability of public health vulnerability in relation to heat and the built environment, the data are too aggregated to get a sense of the actually spatial dependency of these relationships.
+Likewise, many studies look at heat-related mortality, however, these counts are not only low enough to be statistically problematic, the mortality coding is problematic as well.
+Few, if any, studies incorporate atmospheric, physical, and social systems.
+
+The long-standing paradigm for studying urban systems was to conceptualize them as human systems superimposed upon natural systems.
+It has become clear that a more accurate model is that of coupled and natural systems which explicitly characterize the multidirectional and dynamic interactions between these systems.
+The modelling of coupled and human natural systems requires statistical techniques that unite data across spatial and temporal scales and can derive meaning over many levels of uncertainty.
+Improving these techniques will be key to predicting the effects of climate change on public health.
+Understading how human and natural systems are coupled requires modeling the couplings across spatial and temporal scales [@Liu2007a}.
+
+## Research questions
+
+How do social determinants of health interact with climate and urban infrastructure and environment to produce variabilities in public health outcomes?
+
+# Data {#data}
+
+## Study area {#study-area}
+
+The Kansas City metropolitan area as delineated by the United States Census Bureau is located at 39.0398$^{\circ}$N latitude and 94.5949$^{\circ}$W longitude and spans two states and six counties: Johnson and Wyandotte Counties in Kansas, and Platte, Clay, Cass, and Jackson Counties in Missouri.
+The Köppen climate classification is humid subtropical (Cfa), with rainfall year round, averaging 964mm annually. The annual temperature average is 12.8$^{\circ}$C, with a maximum average high of 26.1$^{\circ}$C in July and a minimum average low of -2$^{\circ}$C in January (https://en.climate-data.org/location/715044).
+The Kansas City metro area exhibits characteristic patterns of urban sprawl, which is generally defined as “geographic expansion over large areas, low-density land use, low land-use mix, low connectivity, and heavy reliance on automobiles relative to other modes of travel”  [@Stone2010} showing a 55 percent increase in built area between 1972 and 2001 [@Ji2008}.
+The Kansas City metro area  had an estimated population of 2,142,419 in 2018, a 5 percent increase from 2000.
+An estimated 24.2\% of the population are under the age of 18.
+ 73.9\% of the population under the age of 18 are identified as white alone, 7.4\% as black alone, 0.3\% as American Indian alone, 3.2\% as asian alone, 0.4\% as native Hawaiian alone, and 2.6\% as some other race alone.
+ 6.9\% of the population identify as two or more races and 11.7\% identify as hispanic or latino of any race.
+ In 2018, 5.1\% of children under the age of 18 lived in households with income below the poverty level and 7.6\% lived in households receiving some kind of public assistance.
+ 31.4\% live in single parent households (https://data.census.gov/cedsci).
+
+## KC Health CORE {#health-core}
+
+KC Health CORE is a collaborative initiative between Children’s Mercy Hospital and the Center for Economic Information at the University of Missouri, Kansas City created to investigate the geographic disparity of pediatric health outcomes.
+This analysis will use pediatric asthma data from 2000-2012 geocoded to street centerlines based on the patients’ home address at the time of admission.
+The data come from a retrospective collection of pediatric asthma encounters within the Children’s Mercy Hospital network.
+In this instance children ages 2-18 are considered. The original medical records were formatted according to Table \@ref(tab:original-asthma-data).
+
+\begin{table}
+	\caption{Structure of the original pediatric asthma data records submitted by CMH to UMKC-CEI. \label{tab:original-asthma-data}}
+	\centering
+	\begin{tabular}{ll}
+		\toprule
+		Category & Attributes \\
+		\midrule
+		Diagnosis & Date of admission \\
+		& ICD-9 code \\
+		& Event account number \\
+		& Patient medical record number (MRN) \\
+		& Patient residential address \\
+		\midrule
+		Demographics & Birthdate \\
+		& Sex \\
+		& Race \\
+		& Ethnicity \\
+		\midrule
+		Visit characteristics & Payment type \\
+		& Patient class \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+The data were further classified into three severity levels according to the ICD-9 diagnoses codes (International Classification of Diseases, 9^th^ revision) and the patient class.
+The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc.
+
+## Pediatric asthma {#ped-asthma}
+
+Asthma is a collection of symptoms that produce breathing difficulties.
+Asthma has been variously shown to be effected by air pressure, temperature, thunderstorms, allergens, and air pollution.
+ Asthma occurence has been shown to be higher in individuals living close to highways and railways and other high traffic density areas.
+ Asthma occurence also tends to be higher in people of color and among the urban poor.
+ Few studies examine the syncronicities between these factors however.
+
+## Atmospheric data {#atmo-data}
+
+ Atmospheric data were retrieved from the NOAA National Centers for Environmental Information for the Kansas City Downtown Airport, MO, US.
+ The station is located at 39.1208$^{\circ}$N, 94.5969$^{\circ}$W. Daily precipitation totals, maximum temperature, and minimum temperature were retrieved for all dates between 1900-01-01 and 2019-10-19.
+ Daily average wind speed, direction of fastest 2-minute wind, and Direction of fastest 5-minute wind were retrieved for the years 2000-2012.
+ Daily maximum 8-hour ozone concentration and daily mean PM2.5 concentration were retrieved from the EPA for the JFK Community Center in Kansas City, KS, US, located at 39.117219$^{\circ}$N, 94.635605$^{\circ}$W for the years 2000-2012.
+ The spatial variation of meteorological data will be assessed using remotely-sensed data including land surface temperature and any other variables available.
+ Percentiles within a five-day window across all years were constructed for all variables, as well as the number of days in a row where these variables exceeded extreme percentiles, namely 0.01, 0.05, 0.1, 0.2, 0.8, 0.9, 0.95, and 0.99.
+ The diurnal temperature range was also calculated.
+
+## Spatial data {#spatial-data}
+
+ The Mid-America Regional Council (MARC) created the Natural Resources Inventory (NRI) map of Greater Kansas City with an object-based classification, using SPOT data from May, June, and August of 2012 as well as ancillary data (LiDAR, hydrography, parcels/zoning class, transportation centerlines, streamlines, and floodplains).
+ The resulting land cover map has an estimated accuracy of 83 - 91\% for the Level I classifications of impervious, barren, vegetated, and water.
+ Impervious comprises buildings and other impervious surfaces, barren comprises land with 0 - 10\% vegetated fraction, vegetated comprises land with 10-100\% vegetated fraction, and water comprises water features.
+ The spatial resolution of the NRI landcover map is 2.5 m and the extent is the 4,423 square miles that comprise the 9 county Kansas City metropolitan area [@Mid-2013}.
+
+ Additionally, spatial features will be acquired for the study area, including, but not limited to: street and highway network, rail network, and power infrastructure.
+ Traffic density data will also be acquired if possible.
+ Spatial analysis methods may include overlays to calculate density of infrastructure networks within a set of buffer distances from severe asthma cases, proximity to greenspace, and Bayesian hierarchical spatio-temporal modelling [@Khana2018}.
+ 
+# References

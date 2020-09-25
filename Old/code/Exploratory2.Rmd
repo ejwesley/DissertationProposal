@@ -1,0 +1,380 @@
+---
+title: "Dissertation Proposal"
+author: "Elizabeth Jane Wesley"
+output:
+  pdf_document:
+    df_print: tibble
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+```{r, message = F, warning = F}
+library(tidyverse)
+library(lubridate)
+library(here)
+#library(tibbletime)
+library(RcppRoll)
+```
+
+## Load data.
+
+```{r, message = F, warning = F}
+read_csv(here("raw_data", "LongTermWeather.csv")) %>%
+  group_by(NAME) %>% 
+  summarise(min = min(DATE),
+            max = max(DATE))
+
+## Remove leap days and calculate time (day) stamp
+
+atmo <- read_csv(here("raw_data", "LongTermWeather.csv")) %>%  
+  filter(NAME == "KANSAS CITY DOWNTOWN AIRPORT, MO US") %>% 
+  complete(DATE = seq.Date(min(DATE), max(DATE), by="day")) %>%
+  select(TMAX, TMIN, DATE) %>% 
+  filter(!(month(DATE) == 2 & day(DATE) == 29)) %>% 
+  gather(key = "Var", value = "Value", -DATE) %>% 
+  group_by(year(DATE), Var) %>% 
+  mutate(time = row_number()) %>% 
+  ungroup() %>% 
+  select(-"year(DATE)")
+```
+
+# There are NA values for 4 dates within the asthma date range. Let's look at the surrounding dates to see if it would be appropriate to inpute a mean
+
+```{r}
+# miss.2005 <- asthma %>% 
+#   filter(date > "2005-01-07", date < "2005-01-14")
+# miss.2012 <- asthma %>% 
+#   filter(date > "2012-02-25", date < "2012-03-03")
+# miss.2011 <- asthma %>% 
+#   filter(date > "2011-09-12", date < "2011-09-18")
+```
+
+The answer is no!! 
+
+# Inpute values for NA dates from the Leavenworth station
+# https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00003947/detail
+
+```{r}
+inpute <- tribble(
+  ~ TMAX, ~ TMIN, ~ DATE,
+  32, 25, "2005-01-10",
+  30, 24, "2005-01-11",
+  59, 40, "2011-09-15",
+  61, 39, "2012-02-28") 
+
+inpute <- inpute %>% 
+  mutate(DATE = as_date(DATE),
+         TMAX = round(((TMAX - 32) * 5/9), 1), 
+         TMIN = round(((TMIN - 32) * 5/9), 1)) %>% 
+  gather("Var", "Value", -DATE)
+
+atmo <- atmo %>% 
+  left_join(inpute, by = c("DATE", "Var")) %>% 
+  mutate(Value = coalesce(Value.x, Value.y)) %>% 
+  select(-Value.x, -Value.y)
+```
+
+## Percentiles across all years within a five-day window
+
+```{r}
+atmo2 <- tibble()
+
+# cumulative distance within a five day rolling window; group_by(Var) did something weird with the cume_dist
+# window function so I used a for loop instead of map
+# There are some missing values which are ignored
+
+for (v in c("TMAX", "TMIN")){
+  
+  var <- filter(atmo, Var == v) 
+  cdfs <- tibble()
+  
+  for (d in unique(atmo$time)){
+    
+    cdf <- bind_rows(filter(var, time == d - 2),
+                    filter(var, time == d - 1),
+                    filter(var, time == d),
+                    filter(var, time == d + 1),
+                    filter(var, time == d + 2)) %>% 
+           arrange(Value) %>% 
+           mutate(cdf = cume_dist(Value)) %>% 
+           filter(time == d)
+    cdfs <- bind_rows(cdfs, cdf)
+    
+  }
+  atmo2 <- bind_rows(atmo2, cdfs)
+}
+```
+
+
+```{r}
+## Test the cdf calculation
+
+# test <- atmo2 %>% filter(Var == "TMIN", time == d - 2)
+# test2 <- atmo2 %>% filter(Var == "TMIN", time == d -1)
+# test3 <- atmo2 %>% filter(Var == "TMIN", time == d)
+# test4 <- atmo2 %>% filter(Var == "TMIN", time == d + 1)
+# test5 <- atmo2 %>% filter(Var == "TMIN", time == d + 2)
+# t <- bind_rows(test, test2, test3, test4, test5)
+# t <- t %>%  arrange(Value)
+# t <-  t %>% mutate(cdf.test = cume_dist(Value)) %>% 
+#   filter(time == d)
+# 
+# sum(t$cdf != t$cdf.test, na.rm = T)
+# 
+# ggplot(filter(atmo2, time == 180)) + 
+#   geom_point(aes(Value, cdf)) + 
+#   facet_wrap(~ Var, ncol = 1, scales = "free")
+```
+
+## Join asthma data and make long, right join to keep both TMAX and TMIN, drop all rows where there are not counts associated with the temperature variables
+
+```{r}
+asthma <- read_csv(here("raw_data", "asthma_noid.csv")) %>% 
+  select(date, count) %>% 
+  distinct() %>% 
+  arrange(count) %>% 
+  mutate(count.cdf = cume_dist(count)) %>% 
+  right_join(atmo2, by = c("date" = "DATE")) %>% 
+  mutate(year = year(date),
+          month = month(date),
+          day = wday(date, label = T, week_start = getOption("lubridate.week.start", 1)),
+          doy = yday(date)) %>% 
+  drop_na(count)
+```
+
+# Asthma counts show a clear increasing trend across years. I think this is probably not a real increase but due to reporting or something like that. Remove the linear trend.
+
+```{r}
+asthma.fit <- lm(count ~ year, data = asthma)
+summary(asthma.fit)
+
+asthma <- asthma %>% 
+  mutate(count.detrend.yr = asthma.fit$residuals,
+         count.detrend.yr.cdf = cume_dist(count.detrend.yr))
+```
+
+# Number of days in a row the atmo variables are above the 80th, 90th, 95th, & 99th percentiles, or below the 1st, 5th, 10th, or 20th
+
+```{r}
+asthma2 <- asthma
+
+h.pcts <- c(.80, .90, .95, .99)
+l.pcts <- c(.01, .05, .10, .20)
+
+for (p in h.pcts){
+  
+  tmax <- asthma %>% 
+    filter(Var == "TMAX") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+    
+  for (row in 1:nrow(tmax)){
+    if (row == 1 & tmax$cdf[row] >= p){
+      tmax$pct[row] = 1
+    } else if (tmax$cdf[row] < p){
+      tmax$pct[row] = 0
+    } else {
+      tmax$pct[row] = tmax$pct[row - 1] + 1
+    }
+  }
+  
+  tmin <- asthma %>% 
+    filter(Var == "TMIN") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+  
+  for (row in 1:nrow(tmin)){
+    if (row == 1 & tmin$cdf[row] >= p){
+      tmin$pct[row] = 1
+    } else if (tmin$cdf[row] < p){
+      tmin$pct[row] = 0
+    } else {
+      tmin$pct[row] = tmin$pct[row - 1] + 1
+    }
+  }
+  
+  x <- bind_rows(tmax, tmin) %>% 
+    rename(!!sym(paste0("pct", p)) := pct)
+  
+  
+  
+  asthma2 <- left_join(asthma2, x)
+}
+
+for (p in l.pcts){
+  
+  tmax <- asthma %>% 
+    filter(Var == "TMAX") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+    
+  for (row in 1:nrow(tmax)){
+    if (row == 1 & tmax$cdf[row] <= p){
+      tmax$pct[row] = 1
+    } else if (tmax$cdf[row] > p){
+      tmax$pct[row] = 0
+    } else {
+      tmax$pct[row] = tmax$pct[row - 1] + 1
+    }
+  }
+  
+  tmin <- asthma %>% 
+    filter(Var == "TMIN") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+  
+  for (row in 1:nrow(tmin)){
+    if (row == 1 & tmin$cdf[row] <= p){
+      tmin$pct[row] = 1
+    } else if (tmin$cdf[row] > p){
+      tmin$pct[row] = 0
+    } else {
+      tmin$pct[row] = tmin$pct[row - 1] + 1
+    }
+  }
+  
+  x <- bind_rows(tmax, tmin) %>% 
+    rename(!!sym(paste0("pct", p)) := pct)
+  
+  
+  
+  asthma2 <- left_join(asthma2, x)
+}
+```
+# Make long
+
+```{r}
+asthma.long <- asthma2 %>% 
+  gather(key = "Percentile", value = "Run", starts_with("pct"))
+```
+
+## Plot variable by date.
+
+```{r}
+# Counts show a consistent pattern as a function of weekday. Mondays are highest declining to a low on Saturday.
+ggplot(asthma2) +
+  geom_col(aes(day, count.detrend.yr, fill = day)) +
+  facet_wrap(~ year, scales = "free")
+
+asthma.long %>% filter(Var == "TMAX", Run != 0) %>% 
+  ggplot() +
+  geom_point(aes(Run, count.detrend.yr)) +
+  geom_smooth(aes(Run, count.detrend.yr), method = "lm") +
+  facet_wrap(~ Percentile, scales = "free")
+
+asthma.long %>% 
+  filter(Var == "TMAX") %>% 
+  ggplot() +
+  geom_point(aes(Value, count.detrend.yr)) +
+  geom_smooth(aes(Value, count.detrend.yr), method = "lm") +
+  facet_wrap(~ month, scales = "free")
+
+asthma2 %>% 
+  filter(Var == "TMAX") %>% 
+  ggplot() +
+  geom_point(aes(Value, count.cdf)) +
+  geom_smooth(aes(Value, count.cdf), method = "lm") +
+  facet_wrap(~ month, scales = "free_x")
+
+asthma2 %>% 
+  filter(Var == "TMAX") %>% 
+  ggplot() +
+  geom_point(aes(Value, count.detrend.yr.cdf)) +
+  geom_smooth(aes(Value, count.detrend.yr.cdf), method = "lm") +
+  facet_wrap(~ month, scales = "free_x")
+
+asthma2 %>% 
+  filter(Var == "TMAX") %>% 
+  ggplot() +
+  geom_point(aes(cdf, count.detrend.yr.cdf)) +
+  geom_smooth(aes(cdf, count.detrend.yr.cdf), method = "lm") +
+  facet_wrap(~ month, scales = "free_x")
+
+asthma2 %>% 
+  filter(Var == "TMAX", pct0.8 > 0) %>% 
+  ggplot() +
+  geom_point(aes(cdf, count.detrend.yr.cdf)) +
+  geom_smooth(aes(cdf, count.detrend.yr.cdf), method = "lm") +
+  facet_wrap(~ month, scales = "free_x")
+
+asthma2 %>% 
+  filter(Var == "TMAX", count.detrend.yr.cdf >= 0.8) %>% 
+  ggplot() +
+  geom_point(aes(Value, count.detrend.yr.cdf)) +
+  geom_smooth(aes(Value, count.detrend.yr.cdf), method = "lm") +
+  facet_wrap(~ month, scales = "free")
+  
+```
+
+# t-test for TMAX percentile counts vs TMAX non percentile counts
+
+```{r}
+diff.dist <- function(pct){
+  
+  high <- asthma.long %>% 
+    filter(Var == "TMAX", month %in% c(7, 8), cdf >= pct) %>% 
+    select(count) %>% 
+    unlist()
+  
+  not <-  asthma.long %>% 
+    filter(Var == "TMAX", month %in% c(7, 8), cdf < pct) %>% 
+    select(count) %>% 
+    unlist()
+  
+  t.test(high, not)
+  
+  ggplot() +
+    geom_density(aes(high, color = "red")) +
+    geom_density(aes(not, color = "blue")) +
+    scale_color_manual(labels = c("Exceeds TMAX\npercentile", "Below TMAX\npercentile"), values = c("red", "blue")) +
+    labs(title = pct) +
+    xlab("Count")
+}
+
+map(h.pcts, diff.dist)
+
+```
+
+# t-test for count percentiles  vs count non percentile 
+
+```{r}
+diff.dist <- function(pct){
+  
+  high <- asthma.long %>% 
+    filter(Var == "TMAX", month %in% c(7, 8), count.detrend.yr.cdf >= pct) %>% 
+    select(Value) %>% 
+    unlist()
+  
+  not <-  asthma.long %>% 
+    filter(Var == "TMAX", month %in% c(7, 8), count.detrend.yr.cdf < pct) %>% 
+    select(Value) %>% 
+    unlist()
+  
+  print(t.test(high, not))
+  
+  ggplot() +
+    geom_density(aes(high, color = "red")) +
+    geom_density(aes(not, color = "blue")) +
+    scale_color_manual(labels = c("Exceeds count\npercentile", "Below count\npercentile"), values = c("red", "blue")) +
+    labs(title = pct) +
+    xlab("TMAX")
+}
+
+map(h.pcts, diff.dist)
+
+```
+# 99th percentile
+
+```{r}
+asthma.long %>% 
+  filter(Var == "TMAX", cdf >= 0.99) %>% 
+  ggplot() +
+  geom_point(data = asthma.long, aes(date, count)) +
+  geom_point(aes(date, count), color = "red", size = 2) 
+  
+
+
+```
+
+

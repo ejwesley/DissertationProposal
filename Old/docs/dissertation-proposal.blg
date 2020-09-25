@@ -1,0 +1,87 @@
+This is BibTeX, Version 0.99d (TeX Live 2018)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: dissertation-proposal.aux
+The style file: apalike.bst
+Database file #1: Dissertation-Proposal.bib
+Warning--entry type for "Mid-2013" isn't style-file defined
+--line 562 of file Dissertation-Proposal.bib
+Warning--entry type for "UnitedNations2019" isn't style-file defined
+--line 773 of file Dissertation-Proposal.bib
+Warning--empty year in Ayres-Sampaio2014
+Warning--empty journal in Ayres-Sampaio2014
+Warning--empty year in babinPediatricPatientAsthmarelated2007
+Warning--empty journal in babinPediatricPatientAsthmarelated2007
+Warning--empty year in Bai2018
+Warning--empty journal in Bai2018
+Warning--empty year in ferreirabragaTimeCourseWeatherRelated2001
+Warning--empty journal in ferreirabragaTimeCourseWeatherRelated2001
+Warning--empty year in Heynan2006
+Warning--empty journal in Heynan2006
+Warning--empty year in Ji2008
+Warning--empty journal in Ji2008
+Warning--empty year in Khana2018
+Warning--empty journal in Khana2018
+Warning--empty year in Liu2007
+Warning--empty journal in Liu2007
+Warning--empty year in Liu2007a
+Warning--empty journal in Liu2007a
+Warning--empty year in McMichael2012
+Warning--empty journal in McMichael2012
+Warning--empty year in McPhearson2016
+Warning--empty journal in McPhearson2016
+Warning--empty year in Mid-2013
+Warning--empty year in nowakAirPollutionRemoval2006
+Warning--empty journal in nowakAirPollutionRemoval2006
+Warning--empty year in Pickett2001
+Warning--empty journal in Pickett2001
+Warning--empty year in Stone2010
+Warning--empty journal in Stone2010
+Warning--empty year in Trochim2006
+Warning--empty journal in Trochim2006
+Warning--empty year in UnitedNations2019
+Warning--empty year in villeneuveCohortStudyRelating2012b
+Warning--empty journal in villeneuveCohortStudyRelating2012b
+Warning--empty year in Wolch2014
+Warning--empty journal in Wolch2014
+You've used 19 entries,
+            1935 wiz_defined-function locations,
+            593 strings with 8524 characters,
+and the built_in function-call counts, 9393 in all, are:
+= -- 864
+> -- 600
+< -- 3
++ -- 229
+- -- 218
+* -- 893
+:= -- 1651
+add.period$ -- 55
+call.type$ -- 19
+change.case$ -- 204
+chr.to.int$ -- 18
+cite$ -- 55
+duplicate$ -- 258
+empty$ -- 530
+format.name$ -- 239
+if$ -- 1726
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 17
+newline$ -- 96
+num.names$ -- 57
+pop$ -- 237
+preamble$ -- 1
+purify$ -- 204
+quote$ -- 0
+skip$ -- 151
+stack$ -- 0
+substring$ -- 638
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 114
+warning$ -- 36
+while$ -- 71
+width$ -- 0
+write$ -- 207
+(There were 38 warnings)

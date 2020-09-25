@@ -1,0 +1,877 @@
+---
+title: "CART"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(fs)
+library(rpart)
+library(tibbletime)
+library(rpart.plot)
+library(broom)
+```
+
+# Asthma data
+Contains all three severity levels, each row is an individual observation. Duplicates have been removed.
+
+```{r}
+asthma <- read_csv(here("raw_data", "full_asthma.csv"),
+                   col_types = "Dff") %>% 
+  rename(date = ADMIT_DATE, 
+         class = PATIENT_CLASS_01, 
+         severity = SEVERITY_01) %>% 
+  mutate(severity = fct_relevel(severity, sort))
+```
+
+Collapse to get count by date per category. Add zeros for days with no counts in certain levels of severity.
+
+```{r}
+asthma <- asthma %>% 
+  group_by(date, severity) %>% 
+  summarise(count = n()) %>% 
+  filter(year(date) >= 2000) %>% 
+  ungroup() %>% 
+  spread(severity, count, fill = 0) %>% 
+  gather(key = severity, value = count, -date)
+  
+```
+
+# Time-series plots
+
+```{r}
+ggplot(asthma) +
+  geom_line(aes(date, count, color = severity)) +
+  facet_wrap(~ year(date), scales = "free")
+
+asthma %>% 
+  filter(year(date) > 2007) %>%   
+  ggplot() +
+  geom_line(aes(yday(date), count, color = as.factor(year(date)))) +
+  facet_wrap(~ severity, ncol = 1, scales = "free_y")
+
+asthma %>% 
+  filter(month(date) >= 7, month(date) < 10, severity != 1, year(date) > 2004) %>% 
+  ggplot() +
+  geom_line(aes(yday(date), count, color = as.factor(year(date)))) +
+  facet_wrap(~ severity, ncol = 1, scales = "free") 
+```
+
+Looks like something might be going on in August 2012. Also, looking at the severity levels across all year, the level 3 severity is not increasing the way the other two levels, especially level 2, are. Check out 2009 too. 
+
+# atmo data
+
+```{r message=F}
+atmo <- read_csv(here("raw_data", "LongTermWeather.csv")) %>%  
+  filter(NAME == "KANSAS CITY DOWNTOWN AIRPORT, MO US") %>% 
+  complete(DATE = seq.Date(min(DATE), max(DATE), by="day")) %>%
+  select(TMAX, TMIN, PRCP, DATE) %>% 
+  #filter(!(month(DATE) == 2 & day(DATE) == 29)) %>% 
+  gather(key = "Var", value = "Value", -DATE) %>% 
+  group_by(year(DATE), Var) %>% 
+  mutate(time = row_number()) %>% 
+  ungroup() %>% 
+  select(-"year(DATE)")
+
+# Inpute values for NA dates from the Leavenworth station
+# https://www.ncdc.noaa.gov/cdo-web/datasets/GHCND/stations/GHCND:USW00003947/detail
+
+inpute <- tribble(
+  ~ TMAX, ~ TMIN, ~ DATE,
+  32, 25, "2005-01-10",
+  30, 24, "2005-01-11",
+  59, 40, "2011-09-15",
+  61, 39, "2012-02-28") 
+
+inpute <- inpute %>% 
+  mutate(DATE = as_date(DATE),
+         TMAX = round(((TMAX - 32) * 5/9), 1), 
+         TMIN = round(((TMIN - 32) * 5/9), 1)) %>% 
+  gather("Var", "Value", -DATE)
+
+atmo <- atmo %>% 
+  left_join(inpute, by = c("DATE", "Var")) %>% 
+  mutate(Value = coalesce(Value.x, Value.y)) %>% 
+  select(-Value.x, -Value.y) %>% 
+  rename(date = DATE)
+
+## Percentiles across all years within a five-day window
+
+atmo2 <- tibble()
+
+for (v in c("TMAX", "TMIN")){
+  
+  var <- filter(atmo, Var == v) 
+  cdfs <- tibble()
+  
+  for (d in unique(atmo$time)){
+    
+    cdf <- bind_rows(filter(var, time == d - 2),
+                    filter(var, time == d - 1),
+                    filter(var, time == d),
+                    filter(var, time == d + 1),
+                    filter(var, time == d + 2)) %>% 
+           arrange(Value) %>% 
+           mutate(cdf = cume_dist(Value)) %>% 
+           filter(time == d)
+    cdfs <- bind_rows(cdfs, cdf)
+    
+  }
+  atmo2 <- bind_rows(atmo2, cdfs)
+}
+
+# Limit atmo data to years in asthma data
+atmo2 <- atmo2 %>% 
+  filter(date >= min(asthma$date), date <= max(asthma$date))
+
+# Number of days in a row the atmo variables are above the 80th, 90th, 95th, & 99th percentiles, or below the 1st, 5th, 10th, or 20th
+
+
+h.pcts <- c(.80, .90, .95, .99)
+l.pcts <- c(.01, .05, .10, .20)
+
+for (p in h.pcts){
+  
+  tmax <- atmo2 %>% 
+    filter(Var == "TMAX") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+    
+  for (row in 1:nrow(tmax)){
+    if (row == 1 & tmax$cdf[row] >= p){
+      tmax$pct[row] = 1
+    } else if (tmax$cdf[row] < p){
+      tmax$pct[row] = 0
+    } else {
+      tmax$pct[row] = tmax$pct[row - 1] + 1
+    }
+  }
+  
+  tmin <- atmo2 %>% 
+    filter(Var == "TMIN") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+  
+  for (row in 1:nrow(tmin)){
+    if (row == 1 & tmin$cdf[row] >= p){
+      tmin$pct[row] = 1
+    } else if (tmin$cdf[row] < p){
+      tmin$pct[row] = 0
+    } else {
+      tmin$pct[row] = tmin$pct[row - 1] + 1
+    }
+  }
+  
+  x <- bind_rows(tmax, tmin) %>% 
+    rename(!!sym(paste0("pct", p)) := pct)
+  
+  
+  
+  atmo2 <- left_join(atmo2, x)
+}
+
+for (p in l.pcts){
+  
+  tmax <- atmo2 %>% 
+    filter(Var == "TMAX") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+    
+  for (row in 1:nrow(tmax)){
+    if (row == 1 & tmax$cdf[row] <= p){
+      tmax$pct[row] = 1
+    } else if (tmax$cdf[row] > p){
+      tmax$pct[row] = 0
+    } else {
+      tmax$pct[row] = tmax$pct[row - 1] + 1
+    }
+  }
+  
+  tmin <- atmo2 %>% 
+    filter(Var == "TMIN") %>% 
+    mutate(pct = 0) %>% 
+    arrange(date)
+  
+  for (row in 1:nrow(tmin)){
+    if (row == 1 & tmin$cdf[row] <= p){
+      tmin$pct[row] = 1
+    } else if (tmin$cdf[row] > p){
+      tmin$pct[row] = 0
+    } else {
+      tmin$pct[row] = tmin$pct[row - 1] + 1
+    }
+  }
+  
+  x <- bind_rows(tmax, tmin) %>% 
+    rename(!!sym(paste0("pct", p)) := pct)
+  
+  
+  
+  atmo2 <- left_join(atmo2, x)
+}
+
+tmax <- atmo2 %>% 
+  filter(Var == "TMAX") %>% 
+  gather(Pctl, Run, starts_with("pct")) %>% 
+  unite(temp, Var, Pctl) %>%
+  spread(temp, Run) %>% 
+  rename(TMAX = Value,
+         cdf.TMAX = cdf)
+
+tmin <- atmo2 %>% 
+  filter(Var == "TMIN") %>% 
+  gather(Pctl, Run, starts_with("pct")) %>% 
+  unite(temp, Var, Pctl) %>%
+  spread(temp, Run) %>% 
+  rename(TMIN = Value,
+         cdf.TMIN = cdf) %>% 
+  select(-time)
+
+# 2 missing prcp values, set to 0
+prcp <- atmo %>% 
+  spread(Var, Value) %>% 
+  filter(date >= min(asthma$date), date <= max(asthma$date)) %>% 
+  select(date, PRCP) %>% 
+  mutate(PRCP = replace_na(PRCP, 0))
+```
+
+# Air quality data
+https://www.epa.gov/outdoor-air-quality-data/download-daily-data
+
+Site JFK is in KCK, near downtown, maybe an industrial area
+```{r message=F}
+files <- dir_ls(here("raw_data", "airquality", "ozone"))
+ozone <- map_df(files, read_csv) %>% 
+  filter(`Site Name` == "JFK") %>% 
+  mutate(date = mdy(Date)) %>% 
+  select(date, max.ozone = `Daily Max 8-hour Ozone Concentration`)
+
+# POC – Parameter Occurrence Code. Used to uniquely identify a monitor if there is more than one device measuring the same pollutant at the same site. 
+# Use the max value for multiple observations on one day
+
+files <- dir_ls(here("raw_data", "airquality", "PM25"))
+PM25 <- map_df(files, read_csv) %>% 
+  filter(`Site Name` == "JFK") %>% 
+  mutate(date = mdy(Date)) %>% 
+  group_by(date) %>% 
+  summarise(mean.PM2.5 = max(`Daily Mean PM2.5 Concentration`))
+```
+
+# Combine data
+
+```{r}
+dat <- plyr::join_all(list(asthma, tmax, tmin, prcp, ozone, PM25), 
+                      by = "date") %>% 
+  as_tbl_time(date) %>% 
+  mutate(t.diff = TMAX - TMIN)
+
+# ggplot(dat) + 
+#   geom_point(aes(max.ozone, count)) +
+#   facet_wrap(~ month(date), scales = "free")
+# 
+# ggplot(dat) + 
+#   geom_point(aes(mean.PM2.5, count)) +
+#   facet_wrap(~ month(date), scales = "free")
+# 
+# ggplot(dat) + 
+#   geom_point(aes(TMIN, count)) +
+#   facet_wrap(~ month(date), scales = "free")
+
+dat2012 <- dat %>% 
+  filter(month(date) >= 7, month(date) < 10, severity == 3, year(date) == 2012)
+
+dat2012.pct.9.tmax <- dat2012 %>% 
+  filter(TMAX_pct0.9 > 0) %>% 
+  select(TMAX, date)
+
+dat2012.pct.9.tmin <- dat2012 %>% 
+  filter(TMIN_pct0.9 > 0) %>% 
+  select(TMIN, date)
+
+dat2012 %>% 
+  select(date, severity, count, time, PRCP, t.diff, max.ozone, mean.PM2.5, TMAX_pct0.9) %>% 
+  mutate(max.ozone = max.ozone * 100) %>% 
+  gather(Var, Value, -c(date, severity, count, time, TMAX_pct0.9)) %>% 
+  ggplot() +
+  geom_line(aes(yday(date), Value, group = Var, color = Var)) +
+  geom_line(aes(yday(date), count, group = severity)) +
+  facet_wrap(~ Var, scales = "free")
+
+dat2012 %>% 
+  select(date, severity, count, time, TMAX, TMIN) %>% 
+  gather(Var, Value, -c(date, severity, count, time)) %>% 
+  ggplot() +
+  geom_line(aes(yday(date), Value, group = Var, color = Var)) +
+  geom_point(dat = dat2012.pct.9.tmax, aes(yday(date), TMAX), color = "blue") +
+  geom_point(dat = dat2012.pct.9.tmin, aes(yday(date), TMIN), color = "purple") +
+  geom_line(aes(yday(date), count, group = severity)) 
+```
+
+# Regression tree model, full, unaggregated dataset
+
+```{r}
+# weekday starts on Monday
+model.full <- dat %>% 
+  filter(severity == 3) %>% 
+  mutate(day = wday(date, label = F, week_start = getOption("lubridate.week.start", 1))) %>% 
+  #select(-c(time, date)) %>% 
+  rpart(count ~ ., data = ., model = T)
+
+rpart.plot(model.full,  type = 4, clip.right.labs = FALSE)
+```
+The weekly trend is evident.
+
+```{r}
+dat %>% 
+  filter(severity == 3) %>% 
+  mutate(day = wday(date, label = F, week_start = getOption("lubridate.week.start", 1))) %>% 
+  ggplot() +
+  geom_col(aes(day, count)) +
+  facet_wrap(~ year(date))
+```
+
+# Weekly summaries for data,
+
+```{r}
+dat.wk.sum <- dat %>% 
+  mutate(date = collapse_index(date, "weekly"),
+         t.avg = (TMAX + TMIN)/2,
+         t.diff = TMAX - TMIN) %>% 
+  group_by(date, severity) %>% 
+  summarise(count = sum(count),
+         t.avg = mean(t.avg),
+         t.max = max(TMAX),
+         t.min = min(TMIN),
+         min.diff = min(t.diff),
+         max.diff = max(t.diff),
+         avg.diff = mean(t.diff),
+         tmin.pct.0.01 = sum(cdf.TMIN <= 0.01),
+         tmin.pct.0.05 = sum(cdf.TMIN <= 0.05),
+         tmin.pct.0.10 = sum(cdf.TMIN <= 0.10),
+         tmin.pct.0.20 = sum(cdf.TMIN <= 0.20),
+         tmin.pct.0.80 = sum(cdf.TMIN >= 0.80),
+         tmin.pct.0.90 = sum(cdf.TMIN >= 0.90),
+         tmin.pct.0.95 = sum(cdf.TMIN >= 0.95),
+         tmin.pct.0.99 = sum(cdf.TMIN >= 0.99),
+         tmax.pct.0.01 = sum(cdf.TMAX <= 0.01),
+         tmax.pct.0.05 = sum(cdf.TMAX <= 0.05),
+         tmax.pct.0.10 = sum(cdf.TMAX <= 0.10),
+         tmax.pct.0.20 = sum(cdf.TMAX <= 0.20),
+         tmax.pct.0.80 = sum(cdf.TMAX >= 0.80),
+         tmax.pct.0.90 = sum(cdf.TMAX >= 0.90),
+         tmax.pct.0.95 = sum(cdf.TMAX >= 0.95),
+         tmax.pct.0.99 = sum(cdf.TMAX >= 0.99),
+         tmin.run.0.01 = max(TMIN_pct0.01),
+         tmin.run.0.05 = max(TMIN_pct0.05),
+         tmin.run.0.10 = max(TMIN_pct0.1),
+         tmin.run.0.20 = max(TMIN_pct0.2),
+         tmin.run.0.80 = max(TMIN_pct0.8),
+         tmin.run.0.90 = max(TMIN_pct0.9),
+         tmin.run.0.95 = max(TMIN_pct0.95),
+         tmin.run.0.99 = max(TMIN_pct0.99),
+         tmax.run.0.01 = max(TMAX_pct0.01),
+         tmax.run.0.05 = max(TMAX_pct0.05),
+         tmax.run.0.10 = max(TMAX_pct0.1),
+         tmax.run.0.20 = max(TMAX_pct0.2),
+         tmax.run.0.80 = max(TMAX_pct0.8),
+         tmax.run.0.90 = max(TMAX_pct0.9),
+         tmax.run.0.95 = max(TMAX_pct0.95),
+         tmax.run.0.99 = max(TMAX_pct0.99),
+         ozone.max = max(max.ozone),
+         pm2.5.max = max(mean.PM2.5),
+         prcp.days = sum(PRCP > 0)) %>% 
+  ungroup()
+
+ggplot(dat.wk.sum) +
+  geom_point(aes(date, count, color = severity)) 
+```
+
+# Weekly summary regression tree, severity = 3
+
+```{r}
+model.week <- dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  select(-date) %>% 
+  rpart(count ~ ., data = ., model = T)
+
+rpart.plot(model.week,  type = 4, clip.right.labs = FALSE, extra = 101, cex = .5)
+```
+
+# remove increasing annual trend from weekly count summaries
+
+```{r}
+# yr.fit <- lm(count ~ year(date), data = dat.wk.sum)
+# 
+# dat.wk.sum <- dat.wk.sum %>% 
+#   mutate(count.detrend = yr.fit$residuals) 
+# 
+# model.week.detrend <- dat.wk.sum %>% 
+#   select(-c(date, count)) %>% 
+#   rpart(count.detrend ~ ., data = ., model = T)
+# 
+# rpart.plot(model.week.detrend, type = 4, clip.right.labs = FALSE)
+```
+
+# Run regression tree for each month separately for severity = 3
+
+```{r}
+# dat.wk.sum.mos <- dat.wk.sum %>% 
+#   filter(severity == 3) %>% 
+#   group_by(month(date)) %>% 
+#   nest() %>% 
+#   mutate(model = map(data, function(df) rpart(count ~ . -date, data = df, model = T)))
+# 
+# dat.wk.sum.mos %>% mutate(plot = walk(model, function(x) rpart.plot(x, 
+#                                                   type = 4, 
+#                                                   clip.right.labs = FALSE,
+#                                                   extra = 101,
+#                                                   main = month(x$model$date, label = T)[1])))
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(t.max, count)) +
+  geom_smooth(aes(t.max, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(t.min, count)) +
+  geom_smooth(aes(t.min, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(t.min, count,  color = severity)) +
+  geom_smooth(aes(t.min, count, group = as.factor(month(date)), color = as.factor(month(date))), method = "lm")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(t.max, count)) +
+  geom_smooth(aes(t.max, count, group = as.factor(month(date)), color = as.factor(month(date))), method = "lm")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(ozone.max, count)) +
+  geom_smooth(aes(ozone.max, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(pm2.5.max, count)) +
+  geom_smooth(aes(pm2.5.max, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(prcp.days, count)) +
+  geom_smooth(aes(prcp.days, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(avg.diff, count)) +
+  geom_smooth(aes(avg.diff, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(max.diff, count)) +
+  geom_smooth(aes(max.diff, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+
+dat.wk.sum %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(min.diff, count)) +
+  geom_smooth(aes(min.diff, count), method = "lm") +
+  facet_wrap(~ month(date), scales = "free")
+```
+
+# AGU plots
+
+```{r}
+library(RcppRoll)
+
+# Annual cycle - all years are the same so choosing 2012 is inconsequential
+asthma.avg <- asthma %>% 
+  filter(severity == 3) %>% 
+  #mutate(doy = yday(date)) %>% 
+  group_by(yday(date)) %>% 
+  mutate(avg.ct = mean(count),
+         lower = avg.ct - sd(count),
+         upper = avg.ct + sd(count)) %>% 
+  filter(year(date) == 2012) %>% 
+  ungroup() %>% 
+  mutate(moving.avg = roll_mean(avg.ct, 10, na.rm = T, fill = NA),
+         lower = moving.avg - roll_sd(avg.ct, 10, na.rm = T, fill = NA),
+         upper = moving.avg + roll_sd(avg.ct, 10, na.rm = T, fill = NA))
+
+ggplot(asthma.avg, aes(date, moving.avg)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = .7, show.legend = F, fill = "#D74E26", color = "#D74E26",
+             size = 2) +
+  geom_line(aes(color = "10 day average"), size = 2) +
+  geom_line(aes(color = "Std. dev."), size = 2) +
+  geom_line(size = 2) +
+  scale_colour_manual(name="",
+    values=c("Std. dev." = "#D74E26", "10 day average" = "black")) +
+  ylab("Count per day") +
+  xlab("") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme_bw(base_size = 24) +
+  theme(legend.position = c(0.2, 0.9), legend.background=element_blank()) 
+
+#ggsave("avg_count.pdf", width = 8, height = 4, units = "in")
+
+library(RColorBrewer)
+colourCount = 12
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+
+lab <- expression("Minimum temperature " ( degree*C))
+
+# TMIN against count by month, weekly summaries
+dat.wk.sum %>% 
+  mutate(Month = month(date, label = T, abbr = T)) %>% 
+  filter(severity == 3) %>% 
+  ggplot() +
+  geom_point(aes(t.min, count)) +
+  geom_smooth(aes(t.min, count, group = Month, color = Month, fill = Month), method = "lm") +
+  scale_color_manual(values = getPalette(colourCount), name = "") +
+  scale_fill_manual(values = getPalette(colourCount), name = "") +
+  xlab(lab) +
+  ylab("Count per week") +
+  theme_bw(base_size = 24) +
+  theme(legend.position = c(0.1, 0.7), legend.background=element_blank()) 
+
+ggsave("tmin_count.pdf", width = 8, height = 7)
+
+# Anomalies in 2012 - future direction
+asthma.avg %>% 
+  ggplot() +
+  geom_line(aes(date, count, color = "2012"), size = 2) + 
+  geom_line(aes(date, count, color = "2012"), color = "#D74E26", size = 2) + 
+  geom_line(aes(date, avg.ct, color = "Average (2000 - 2012)"), alpha = 0.7, size = 2) +
+  geom_line(aes(date, avg.ct), color = "black", alpha = 0.7, size = 2) +
+  scale_colour_manual(name="",
+    values=c("2012" = "#D74E26", "Average (2000 - 2012)" = "black")) +
+  ylab("Count per day") +
+  xlab("") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme_bw(base_size = 24) +
+  theme(legend.position = c(0.3, 0.9), legend.background=element_blank()) 
+  
+
+#ggsave("count_2012.pdf", width = 8, height = 4, units = "in")
+```
+
+## Wavelet 
+
+```{r}
+# dat %>% 
+#   filter(severity == 3) %>% 
+#   ggplot() +
+#   geom_point(aes(t.diff, count))
+# 
+library(WaveletComp)
+
+model <- dat %>%
+  filter(severity == 3) %>%
+  analyze.wavelet(my.series = "count",
+                         loess.span = 0,
+                         make.pval = TRUE,
+                         n.sim = 10,
+                  upperPeriod = 256)
+
+wt.image(model,
+         color.key = "quantile",
+         legend.params = list(lab = "wavelet power levels"),
+         periodlab = "period (1 day)",
+         show.date = T)
+
+reconstruct(model)
+wt.avg(model)
+# 
+# periods <- bind_cols(power = model$Power.avg, 
+#                      pval = model$Power.avg.pval, 
+#                      period = model$Period)
+# 
+# # maximum powers are at approx. 175 and 7 days
+# my.rec <- reconstruct(model, sel.period = c(175))
+# my.rec2 <- reconstruct(model)
+# 
+# my.rec$series %>% 
+#   ggplot() +
+#   geom_line(aes(date, count)) +
+#   geom_line(aes(date, count.r), color = "red") +
+#   facet_wrap(~ year(date), scales = "free")
+# 
+# dat2 <- dat %>% 
+#   ungroup() %>% 
+#   filter(severity == 3) %>% 
+#   mutate(detrend = count - my.rec$series$count.r)
+# 
+# ggplot(dat2) +
+#   geom_point(aes(TMIN, detrend))
+
+# dat <- dat %>% 
+#   group_by(date) %>% 
+#   mutate(time = group_indices(),
+#          sin.time = case_when(leap_year(date) ~ sin((2 * pi/366) * time),
+#                               leap_year(date) == 0 ~ sin((2 * pi/365) * time)),
+#          cos.time = case_when(leap_year(date) ~ cos((2 * pi/366) * time),
+#                               leap_year(date) == 0 ~ cos((2 * pi/365) * time)))
+# 
+# severe <- filter(dat, severity == 3)
+# seas.count <- lm(severe$count ~ severe$sin.time + severe$cos.time)
+# 
+# ggplot(severe, aes(time, count)) + 
+#   geom_point() + 
+#   geom_line(data = fortify(seas.count), 
+#             aes(x = 1:length(.fitted), y = .fitted), 
+#             color = "yellow", size = .7) +
+#   facet_wrap(~ year(severe$date), scales = "free")
+
+severe <- dat %>% 
+  filter(severity == 3) %>% 
+  group_by(yday(date)) %>% 
+  mutate(avg.ct = mean(count)) %>% 
+  ungroup() %>% 
+  mutate(moving.avg = roll_mean(avg.ct, 10, na.rm = T, fill = NA),
+         detrend = count - moving.avg) %>% 
+  ungroup() %>% 
+  mutate(detrend.adj = detrend + abs(min(detrend, na.rm = T))) 
+
+# detrend.adj makes it so there are no negative counts
+
+ggplot(severe) +
+  geom_line(aes(date, count), color = "blue") +
+  geom_line(aes(date, detrend.adj), color = "red") +
+  facet_wrap(~ year(date), scales = "free")
+```
+subtracting the yday mean count is the best for detrending I think. Using the periodic fit gives weird scallops to the lower count values
+
+# linear fit by day of week
+
+```{r}
+severe <- severe %>% 
+  mutate(wday = wday(date, label = T))
+
+wday.fit <- lm(detrend ~ wday, data = severe,
+               contrasts=list(wday="contr.treatment"))
+
+severe <- severe %>% 
+  drop_na("detrend") %>% 
+  mutate(wday.resid = as.numeric(wday.fit$residuals),
+         resid.adj = wday.resid + abs(min(wday.resid)))
+
+ggplot(severe) +
+  geom_line(aes(date, count)) +
+  geom_line(aes(date, detrend.adj), color = "red") +
+  geom_line(aes(date, resid.adj), color = "blue") +
+  facet_wrap(~ year(date), scales = "free")
+
+severe %>% filter(year(date) == "2012") %>% 
+ggplot() +
+  geom_line(aes(date, count)) +
+  geom_line(aes(date, detrend.adj), color = "red") +
+  geom_line(aes(date, resid.adj), color = "blue") +
+  facet_wrap(~ year(date), scales = "free")
+```
+
+```{r}
+severe <- severe %>% 
+  select(-severity, -time, -"yday(date)")
+
+model <- severe %>% 
+  select(-date, -resid.adj, -detrend, -detrend.adj, -wday.resid, -wday,
+         -avg.ct, -moving.avg) %>% 
+  rpart(count ~ ., data = ., model = T, minsplit = 2, minbucket = 1)
+
+rpart.plot(model,  type = 4, clip.right.labs = FALSE, extra = 101, cex = .5)
+```
+
+```{r}
+library(varrank)
+library(RTransferEntropy)
+
+trans.entr <- function(df){
+  df <- df %>% 
+    select(resid.adj, Val) %>% 
+    drop_na()
+  y <- df[["resid.adj"]]
+  x <- na.omit(df[["Val"]])
+  transfer_entropy(x, y, 
+                        shuffles = 50, 
+                        nboot = 100, 
+                        quiet = T, 
+                        seed = 5511)
+}
+
+severe.long <- severe %>%
+  select(-count, -detrend, -detrend.adj, -wday.resid, -wday,
+         -avg.ct, -moving.avg) %>% 
+  ungroup %>% 
+  gather(key = Var, value = Val, -date, -resid.adj) %>% 
+  filter(!grepl("pct", Var)) %>% 
+  group_by(Var) %>% 
+  arrange(date) %>% 
+  mutate(Lag0 = Val,
+         Lag1 = lag(Val),
+         Lag2 = lag(Val, 2),
+         Lag3 = lag(Val, 3),
+         Lag4 = lag(Val, 4),
+         Lag5 = lag(Val, 5)) %>% 
+  ungroup() %>% 
+  gather(key = Lag, value = Val, starts_with("Lag")) %>% 
+  group_by(Var, Lag) %>% 
+  nest() %>% 
+  mutate(model = map(data, trans.entr))
+
+severe.long <- severe.long %>% 
+  mutate(TE = map_dbl(model, function(x) summary(x)$coef[1,1]),
+         ETE = map_dbl(model, function(x) summary(x)$coef[1,2]),
+         SE = map_dbl(model, function(x) summary(x)$coef[1,3]),
+         P = map_dbl(model, function(x) summary(x)$coef[1,4]))
+        
+ggplot(TE, aes(x = Var, y = TE, fill = Lag)) +
+  geom_col(position = "dodge") +
+  scale_fill_viridis_d(option = "plasma") +
+  labs(title = "Transfer entropy to severe asthma count",
+       fill = "") +
+  xlab("") +
+  coord_flip() 
+
+ggplot(severe.long, aes(x = Var, y = ETE, color = Lag)) + 
+  geom_hline(yintercept = 0, color = "gray") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(x = NULL, y = "Effective Transfer Entropy") +
+  geom_errorbar(aes(ymin = ETE - qnorm(0.95) * SE,  
+                    ymax = ETE + qnorm(0.95) * SE,
+                    color = Lag), 
+                position=position_dodge(width=0.7),
+                width = 0.5,
+                size = 1) +
+  geom_point(position=position_dodge(width=0.7)) +
+  scale_color_brewer(palette = "RdYlBu", labels = c(0, 1, 2, 3, 4, 5), name = "Lag (days)") +
+  scale_x_discrete(labels = c("TMAX percentile", "TMIN percentile", "Max 8-hour ozone", "Mean pm 2.5", "PRCP", "Diurnal temp range", "TMAX", "TMIN"))
+  
+ggsave(here("plots", "ETE.pdf"), width = 8, height = 4, units = "in") 
+
+```
+
+```{r}
+acf(severe$count)
+acf(severe$count, lag = 500)
+```
+
+```{r}
+ggplot(severe, aes(cdf.TMAX, resid.adj)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+severe %>% 
+  filter(cdf.TMAX >= 0.9) %>% 
+  ggplot() +
+  geom_point(aes(cdf.TMAX, count)) +
+  geom_smooth(aes(cdf.TMAX, count, group = as.factor(month(date)), color = as.factor(month(date))), method = "lm") 
+
+severe %>% 
+  filter(cdf.TMAX >= 0.9) %>% 
+  ggplot() +
+  geom_point(aes(cdf.TMAX, count)) +
+  geom_smooth(aes(cdf.TMAX, count), method = "lm") +
+  facet_wrap(~ month(date))
+  
+
+ggplot(severe) +
+  geom_point(aes(TMAX, count))
+
+library(RColorBrewer)
+colourCount = 12
+getPalette = colorRampPalette(brewer.pal(11, "RdYlBu"))
+
+lab <- expression("Maximum temperature " ( degree*C))
+
+# TMIN against count by month, weekly summaries
+severe %>% 
+  mutate(Month = month(date, label = T, abbr = T)) %>% 
+  filter(resid.adj < 15, month(date) > 5, month(date) < 10) %>% 
+  ggplot() +
+  geom_point(aes(TMAX, resid.adj, group = Month, color = Month)) +
+  geom_smooth(aes(TMAX, count, group = Month, color = Month, fill = Month), method = "lm") +
+  scale_color_manual(values = getPalette(colourCount), name = "") +
+  scale_fill_manual(values = getPalette(colourCount), name = "") +
+  xlab(lab) +
+  ylab("Detrended count") +
+  theme_bw(base_size = 24) +
+  theme(legend.position = c(0.1, 0.9), legend.background = element_blank()) 
+
+ggsave(here("plots", "TMAX_count_resid.pdf"), width = 8, height = 7)
+
+lab <- expression("Minimum temperature " ( degree*C))
+
+# TMIN against count by month, weekly summaries
+severe %>% 
+  mutate(Month = month(date, label = T, abbr = T)) %>% 
+  filter(resid.adj < 15, resid.adj > 2) %>% 
+  ggplot() +
+  geom_point(aes(TMIN, resid.adj, group = Month, color = Month)) +
+  geom_smooth(aes(TMIN, resid.adj, group = Month, color = Month, fill = Month), method = "lm") +
+  scale_color_manual(values = getPalette(colourCount), name = "") +
+  scale_fill_manual(values = getPalette(colourCount), name = "") +
+  xlab(lab) +
+  ylab("Detrended count") +
+  theme_bw(base_size = 24) +
+  theme(legend.position = c(0.1, 0.75), legend.background = element_blank()) 
+
+ggsave("tmin_count_resid.pdf", width = 8, height = 7)
+```
+
+# Linear models for variables at lags and adjusted counts
+```{r}
+severe.long <- severe %>%
+  select(-count, -detrend, -detrend.adj, -wday.resid, -wday,
+         -avg.ct, -moving.avg, -severity, -time, -`yday(date)`) %>% 
+  ungroup %>% 
+  gather(key = Var, value = Val, -date, -resid.adj) %>% 
+  filter(!grepl("pct", Var)) %>% 
+  group_by(Var) %>% 
+  arrange(date) %>% 
+  mutate(Lag0 = Val,
+         Lag1 = lag(Val),
+         Lag2 = lag(Val, 2),
+         Lag3 = lag(Val, 3),
+         Lag4 = lag(Val, 4),
+         Lag5 = lag(Val, 5)) %>% 
+  ungroup() %>% 
+  gather(key = Lag, value = Val, starts_with("Lag")) %>% 
+  group_by(Var, Lag) %>% 
+  nest() 
+
+lag_model <- function(df) {
+  lm(resid.adj ~ Val, data = df)
+}
+
+severe.long.lms <- severe.long %>% 
+  mutate(model = map(data, lag_model),
+         glance = map(model, broom::glance)) %>% 
+  unnest(glance) %>% 
+  select(-data, -model)
+
+ggplot(severe.long.lms, aes(Lag, r.squared)) +
+  geom_point() +
+  geom_point(data = subset(severe.long.lms, p.value <= 0.05), aes(Lag, r.squared), color = "red", size = 2) +
+  facet_wrap(~ Var)
+```
+

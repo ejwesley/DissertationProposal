@@ -1,0 +1,2 @@
+This definition incorporates activities such as: identifying key concepts, their interconnections and feedback loops; understanding the structure of the system as a whole and at different scales; characterizing its dynamic behaviour; describing its inherent resources (such as infrastructure, money or trust) and how these change over time and context; revealing non-linear relationships; and using analysis to reduce complexity and generate insights. 
+\cite{Berry2018}

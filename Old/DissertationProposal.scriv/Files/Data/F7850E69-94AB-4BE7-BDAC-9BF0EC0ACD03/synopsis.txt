@@ -1,0 +1,1 @@
+Cities and city regions are sufficiently dense and of a spatial scale that they influence their local micro-climate. Climate change will interact with these conditions in a variety of ways, some of which will exacerbate the level of climate risk \cite{Revi2014}

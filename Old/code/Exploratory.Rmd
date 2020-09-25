@@ -1,0 +1,154 @@
+---
+title: "Dissertation Proposal"
+author: "Elizabeth Jane Wesley"
+output:
+  pdf_document:
+    df_print: tibble
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+```{r, message = F, warning = F}
+library(tidyverse)
+library(lubridate)
+library(here)
+```
+
+## Load data.
+
+```{r, message = F, warning = F}
+dat <- read_csv(here("raw_data", "KC_weather_2000_12.csv"))
+```
+
+## Subset to July and August 2012, temperature variables
+
+```{r}
+dat <- dat %>% 
+  filter(year(DATE) == 2012 & month(DATE) %in% c(7, 8)) %>% 
+  select(starts_with("TM"), DATE) %>% 
+  gather(key = "Var", value = "Value", -DATE)
+```
+
+## Check to make sure that there are recorded temperatures for each date.
+
+```{r}
+# Make sure that all dates are there, filling with NA if they are not.
+
+dat <- dat %>% 
+  complete(DATE = seq.Date(min(DATE), max(DATE), by="day"))
+```
+
+## Plot TMAX & TMIN by date.
+
+```{r}
+ggplot(dat) +
+  geom_line(aes(DATE, Value, color = Var)) +
+  geom_point(aes(DATE, Value, color = Var)) +
+  ylab("Temperature") 
+```
+
+## Explore ways to quantify extreme heat days
+
+```{r}
+dat <- dat %>% 
+  group_by(Var) %>% 
+  mutate(cdf = cume_dist(Value),
+         pct = percent_rank(Value))
+
+dat <- dat %>% 
+  group_by(group = cumsum(cdf <= 0.75)) %>%
+  mutate(cdf.htday = row_number() - 1) %>%
+  ungroup() %>%
+  select(-group)
+
+dat <- dat %>% 
+  group_by(group = cumsum(pct <= 0.75)) %>%
+  mutate(pct.htday = row_number() - 1) %>%
+  ungroup() %>%
+  select(-group)
+
+dat <- dat %>% 
+  mutate(cdf.htday = as.integer(cdf.htday),
+         pct.htday = as.integer(pct.htday))
+```
+
+## Asthma data. This is not filtered at all, so this is really just a test run.
+
+```{r}
+asthma <- read_csv(here("raw_data", "admit_date.csv")) %>% 
+  rename(DATE = x)
+
+asthma <- asthma %>% 
+  group_by(DATE) %>% 
+  summarise(count = n()) %>% 
+  filter(year(DATE) == 2012 & month(DATE) %in% c(7, 8))
+
+# Make sure that all dates are there, filling with NA if they are not.
+
+asthma <- asthma %>% 
+  complete(DATE = seq.Date(min(DATE), max(DATE), by="day"))
+
+# Join to temp data by date
+
+dat <- dat %>% 
+  full_join(asthma, by = "DATE") %>% 
+  mutate(wday = wday(DATE, label = T))
+
+ggplot(dat) +
+  geom_line(aes(DATE, count))
+
+ggplot(dat) +
+  geom_col(aes(wday, count))
+
+dat <- dat %>% 
+  group_by(Var) %>% 
+  mutate(time = c(1:length(DATE)),
+         sin.time = sin((2 * pi/7) * time),
+         cos.time = cos((2 * pi/7) * time))
+
+tmax <- filter(dat, Var == "TMAX")
+wk.count <- lm(tmax$count ~  tmax$sin.time + tmax$cos.time)
+
+ggplot(tmax, aes(time, count)) + 
+  geom_point() + 
+  geom_line(data = fortify(wk.count), 
+            aes(x = 1:length(.fitted), y = .fitted), 
+            color = "yellow", size = .7)
+tmax <- tmax %>% 
+  bind_cols(tmax, wk.count$residuals)
+
+ggplot(tmax)
+```
+
+## Plot asthma data with temperature data, showing number of cases.
+
+```{r}
+cdf <- filter(dat, cdf.htday > 0)
+pct <- filter(dat, pct.htday > 0)
+
+ggplot() +
+  geom_line(dat, mapping = aes(DATE, Value, color = Var)) +
+  geom_point(cdf, mapping = aes(DATE, Value, size = count)) +
+  facet_wrap(~ Var, ncol = 1, scales = "free")
+  ylab("Temperature") 
+  
+ggplot() +
+  geom_line(dat, mapping = aes(DATE, Value, color = Var)) +
+  geom_point(dat, mapping = aes(DATE, Value, size = count)) +
+  geom_point(pct, mapping = aes(DATE, Value, size = count), color = "red") +
+  facet_wrap(~ Var, ncol = 1, scales = "free")
+  ylab("Temperature") 
+```
+
+```{r}
+ggplot(dat) +
+  geom_point(aes(Value, count, fill = as.factor(pct.htday), color = as.factor(pct.htday))) +
+  facet_grid(~ Var, scales = "free")
+
+ggplot(pct) +
+  geom_point(aes(Value, count, fill = as.factor(pct.htday), color = as.factor(pct.htday))) +
+  facet_grid(~ Var, scales = "free")
+
+```
+

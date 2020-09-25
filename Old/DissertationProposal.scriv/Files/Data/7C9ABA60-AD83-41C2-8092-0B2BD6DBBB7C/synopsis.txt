@@ -1,0 +1,2 @@
+We need to know how urban morphologies, building materials and human activities affect atmospheric circulation, heat and light radiation, urban energy and water budgets.
+\cite{Bai2018}

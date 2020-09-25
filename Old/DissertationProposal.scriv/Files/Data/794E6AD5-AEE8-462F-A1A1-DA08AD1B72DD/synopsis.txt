@@ -1,0 +1,2 @@
+City processes are complex and often far from equilibrium, displaying emergent properties and non-linear dynamics. Urban areas are difficult to plan, manage and govern
+\cite{McPhearson2016}

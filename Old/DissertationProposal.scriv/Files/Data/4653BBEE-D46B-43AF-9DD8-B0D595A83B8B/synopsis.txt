@@ -1,0 +1,3 @@
+Climate simulations need to account for urbanization, and be scaled down to city
+and neighbourhood levels. Methodologies for high-resolution risk assessment of heatwaves, coastal erosion and inundation are needed.
+\cite{Bai2018}

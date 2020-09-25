@@ -1,0 +1,2 @@
+Measuring the burden of disease and how it is changing over time. This calls for quantitative studies — particularly large, longitudinal population health studies and studies from world regions, continents, countries and local places yet to contribute.
+\cite{Berry2018}
