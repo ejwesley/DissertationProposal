@@ -31,17 +31,42 @@ all.levels <- summer2010 %>%
   summarise(count = sum(n),
             LST = first(median)) %>%
   left_join(age.table, by = c("GEOID10" = "GEO_ID")) %>%
-  mutate(rate = count / n.kids)
+  mutate(rate = count / n.kids,
+         GEOID10 = as.factor(GEOID10))
 
+
+# Descriptive plots -------------------------------------------------------
+
+
+# Plot histogram of rates without zeros
 all.levels %>%
   filter(rate > 0) %>%
 ggplot() +
   geom_dotplot(aes(rate), binwidth = 0.00025)
 
+# Scatterplot of rate vs LST without zeros
 all.levels %>%
   filter(rate > 0) %>%
 ggplot() +
   geom_point(aes(LST, rate)) +
   geom_smooth(aes(LST, rate), method = "lm")
+
+# Cases by date
+ggplot(all.levels) +
+  geom_point(aes(Date, count)) +
+  facet_wrap(~ GEOID10)
+
+# Cases per tract for entire summer
+ggplot(all.levels) +
+  geom_bar(aes(count, color = GEOID10))
+
+all.levels %>%
+
+  ggplot() +
+    geom_bar(aes(count, fill = GEOID10), position = "dodge")
+
+# Bayesian model ----------------------------------------------------------
+
+
 
 fit <- brm(n ~ (median | GEOID10), data = summer2010, family = poisson())
