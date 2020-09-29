@@ -1,0 +1,32 @@
+---
+title: "Dissertation Proposal"
+author: "Elizabeth Wesley"
+site: bookdown::bookdown_site
+output:
+  bookdown::pdf_document2:
+    toc: yes
+header-includes:
+   - \usepackage{booktabs}
+bibliography: Dissertation-Proposal.bib  
+---
+
+```{r include = F}
+library(bookdown)
+library(knitr)
+```
+
+
+<!-- Chapters:
+01-intro
+02-data
+03-prelim
+04-limits
+05-path-forward
+06-contingency
+99-ref
+-->
+
+
+
+ 
+
