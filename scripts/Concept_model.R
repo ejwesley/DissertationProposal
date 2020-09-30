@@ -32,7 +32,8 @@ all.levels <- summer2010 %>%
             LST = first(median)) %>%
   left_join(age.table, by = c("GEOID10" = "GEO_ID")) %>%
   mutate(rate = count / n.kids,
-         GEOID10 = as.factor(GEOID10))
+         GEOID10 = as.factor(GEOID10)) %>%
+  ungroup()
 
 
 # Descriptive plots -------------------------------------------------------
@@ -64,6 +65,33 @@ all.levels %>%
 
   ggplot() +
     geom_bar(aes(count, fill = GEOID10), position = "dodge")
+
+
+# Descriptive statistics --------------------------------------------------
+
+daily.n <- all.levels %>%
+  group_by(Date) %>%
+  summarize(n = sum(count))
+
+ggplot() +
+  geom_histogram(data = daily.n, aes(n), bins = 13, binwidth = 0.5)
+
+v <- var(daily.n$n)
+m <- mean(daily.n$n)
+
+# Variance is greater than the mean indicating over dispersion
+
+daily.geog.n <- all.levels %>%
+  group_by(Date, GEOID10) %>%
+  summarize(n = sum(count)) %>%
+  ungroup() %>%
+  group_by(GEOID10) %>%
+  summarise(v = var(n),
+           m = mean(n),
+           over = v > m)
+
+1 - (sum(daily.geog.n$over) / nrow(daily.geog.n))
+# 58% of the census tracts are overdispersed
 
 # Bayesian model ----------------------------------------------------------
 
