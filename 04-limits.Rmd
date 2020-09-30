@@ -1,3 +1,9 @@
 # Limitations of simple modeling techniques {#model-limits}
 
 "Environmental processes arise from interactions of various processes. These interactions are often occurring at various scales in space and time. Although it is often convenient to simplify such systems either by ignoring the multivariate interaction, or by assuming spatial/temporal stationarity, linearity, and Gaussianity, it is increasingly the case that the scientific questions of interest are becoming sufficiently complex that one can no longer justify such assumptions." [@wikleHierarchicalModelsEnvironmental2003]. "these data are often of differing spatial and temporal support, orientation, and alignment, relative to the process of interest" [@wikleHierarchicalModelsEnvironmental2003] "the environment encompasses many different interacting processes. It follows that one of the biggest challenges and growth areas in environmental statistics will be concerned with linking the many processes contributing to specific environmental questions of concern" [@wikleHierarchicalModelsEnvironmental2003].
+
+"THere are varying intervals of time between human-nature interactions and their ecological and socioeconomic effects." [@Liu2007a]
+
+"Studying CHANs requires a new paradigm that emphasizes hierarchical couplings of natural and human sysems across organizational, spatial, and temporal scales." [@Liu2007a]
+
+"It is important to note that there was no expectation of high correlations with the environmental variables because the exacerbation of asthma symptoms depends on several other external factors (e.g., indoor pollution, viral infections) and host factors (e.g., genetics)" [@Ayres-Sampaio2014]

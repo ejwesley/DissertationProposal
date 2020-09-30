@@ -34,7 +34,7 @@ KC Health CORE is a collaborative initiative between Children’s Mercy Hospital
 	\end{tabular}
 \end{table}
 
-The data were further classified into three severity levels according to the ICD-9 diagnoses codes (International Classification of Diseases, 9^th^ revision) and the patient class.
+The data were further classified into three severity levels according to the International Classification of Diseases, 9^th^ revision diagnoses codes (ICD-9~~~~) and the patient class.
 The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc.
 
 ## Pediatric asthma {#ped-asthma}
