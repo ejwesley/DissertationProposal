@@ -1,1 +1,35 @@
 # Preliminary analysis {#prelim}
+
+```{r setup, include = FALSE, cache = FALSE}
+
+# Read in data from Load_data.R in scripts folder
+
+read_chunk(here("scripts", "Load_data.R"))
+```
+
+```{r LST-count, data, echo = FALSE}
+# Plot asthma rate by LST, not including rows with NAs
+all.levels %>% 
+  drop_na() %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(LST, asthma.rate)) +
+  geom_bin2d() 
+```
+
+```{r min-count, data, echo = FALSE}
+all.levels %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(pct.min, asthma.rate)) +
+  geom_bin2d() 
+```
+```{r imp-count, data, echo = FALSE}
+all.levels %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(pct.min, asthma.rate)) +
+  geom_bin2d() 
+```
+
+```{r lst-min, data, echo = FALSE}
+
+```
+
