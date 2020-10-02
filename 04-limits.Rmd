@@ -1,9 +1,10 @@
 # Limitations of simple modeling techniques {#model-limits}
 
+
 * Missing data---cloud cover, etc.
 * Trying to combine qualitative and quantitative data types.
 * Spatial and temporal granularity
-  * (census tracts dividing the city; days, weeks, months, years) -
+  * (census tracts dividing the city; days, weeks, months, years) 
   * levels of detail
 * collinearity
 

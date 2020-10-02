@@ -1,11 +1,11 @@
 # ---- data ---------------------------------------------------------------
 
-# summer2010 <- read_csv(here("data", "Summer2010.csv"),
-#                        col_types = cols(GEOID10 = col_factor(),
-#                                         Date = col_date(format = ""),
-#                                         n = col_integer(),
-#                                         severity = col_factor(),
-#                                         median = col_double()))
+summer2010 <- read_csv(here("data", "Summer2010.csv"),
+                       col_types = cols(GEOID10 = col_factor(),
+                                        Date = col_date(format = ""),
+                                        n = col_integer(),
+                                        severity = col_factor(),
+                                        median = col_double()))
 
 # Read in asthma data
 
@@ -17,7 +17,8 @@ tracts <- tract.obs %>%
   select(GEOID10) %>%
   distinct()
 
-write_csv(tracts, here("data", "Decennial2010", "tract_list.csv"))
+# Write tract list to csv for use in GEE
+# write_csv(tracts, here("data", "Decennial2010", "tract_list.csv"))
 
 
 
@@ -45,8 +46,8 @@ age.table <- read_csv(here("data", "Decennial2010", "Age2010.csv")) %>%
 race.table <- read_csv(here("data", "Decennial2010", "Race2010.csv"), skip = 1) %>%
   mutate(GEOID10 = as.factor(Geo_FIPS),
          pct.maj = PCT_SE_T054_002 * 0.01,
-         pct.min = 1 - pct.maj) %>%
-  select(GEOID10, pct.min)
+         `Pct minority` = 1 - pct.maj) %>%
+  select(GEOID10, `Pct minority`)
 
 
 # Calculate daily rates per tract, all severity levels
@@ -54,10 +55,10 @@ race.table <- read_csv(here("data", "Decennial2010", "Race2010.csv"), skip = 1) 
 all.levels <- summer2010 %>%
   group_by(GEOID10, Date) %>%
   summarise(count = sum(n),
-            LST = first(median)) %>%
+            `Median LST` = first(median)) %>%
   left_join(age.table, by = c("GEOID10" = "GEO_ID")) %>%
   left_join(race.table) %>%
-  mutate(asthma.rate = count / n.kids,
+  mutate(`Asthma rate` = count / n.kids,
          GEOID10 = as.factor(GEOID10)) %>%
   ungroup()
 
@@ -77,7 +78,8 @@ all.levels <-
 
 imp <- read_csv(here("data", "Mean_impervious.csv")) %>%
   select(GEOID10 = geoid10, mean.imp = mean) %>%
-  mutate(GEOID10 = as.factor(GEOID10))
+  mutate(GEOID10 = as.factor(GEOID10),
+         `Mean pct impervious` = mean.imp * .01)
 
 all.levels <- all.levels %>%
   left_join(imp)

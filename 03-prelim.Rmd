@@ -1,7 +1,9 @@
 # Preliminary analysis {#prelim}
 
-```{r setup, include = FALSE, cache = FALSE}
+Basic relationships between variables calculated at the census tract level for the summer (June, July, August) of 2010 (Figs. \@ref(fig:LST-count), \@ref(fig:min-count), \@ref(fig:imp-count), \@ref(fig:lst-imp), \@ref(fig:lst-min), \@ref(fig:imp-min)). LST is the median MODIS pixel value in degrees Celsius, asthma rate is the number of pediatric asthma cases per number of children, the percent minority is the percent of total residents who are non white, and the mean percent impervious is the mean NLCD percent impervious pixel value all calculate at the census tract geography. 
 
+```{r setup, include = FALSE, cache = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # Read in data from Load_data.R in scripts folder
 
 read_chunk(here("scripts", "Load_data.R"))
@@ -11,51 +13,68 @@ read_chunk(here("scripts", "Load_data.R"))
 all.levels
 ```
 
-```{r LST-count, data, echo = FALSE}
+
+```{r LST-count,  fig.cap = cap}
 # Plot asthma rate by LST, not including rows with NAs
 all.levels %>% 
   drop_na() %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(LST, asthma.rate)) +
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Median LST`, `Asthma rate`)) +
   geom_bin2d() +
   geom_smooth(se = F, color = "red")
+
+cap <- "Daily pediatric asthma count by median daily LST"
 ```
 
-```{r min-count, data, echo = FALSE}
+```{r min-count, fig.cap = cap}
 all.levels %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(pct.min, asthma.rate)) +
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Pct minority`, `Asthma rate`)) +
   geom_bin2d() +
   geom_smooth(se = F, color = "red")
-```
-```{r imp-count, data, echo = FALSE}
-all.levels %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(mean.imp, asthma.rate)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
+
+cap = "Daily pediatric asthma count by percent minority"
 ```
 
-```{r lst-imp, data, echo = FALSE}
+```{r imp-count, fig.cap = cap}
 all.levels %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(LST, mean.imp)) +
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Mean pct impervious`, `Asthma rate`)) +
   geom_bin2d() +
   geom_smooth(se = F, color = "red")
+
+cap = "Daily pediatric asthma count by mean percent impervious land cover"
 ```
 
-```{r lst-min, data, echo = FALSE}
+```{r lst-imp, fig.cap = cap}
 all.levels %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(LST, pct.min)) +
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Mean pct impervious`, `Median LST`)) +
   geom_bin2d() +
   geom_smooth(se = F, color = "red")
+
+cap = "Daily median LST by mean percent impervious land cover"
 ```
 
-```{r lst-min, data, echo = FALSE}
+```{r lst-min, fig.cap = cap}
 all.levels %>% 
-  filter(asthma.rate > 0) %>% 
-  ggplot(aes(mean.imp, pct.min)) +
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Median LST`, `Pct minority`)) +
   geom_bin2d() +
   geom_smooth(se = F, color = "red")
+
+cap = "Percent minority by daily median LST"
 ```
+
+```{r imp-min, fig.cap = cap}
+all.levels %>% 
+  filter(`Asthma rate` > 0) %>% 
+  ggplot(aes(`Mean pct impervious`, `Pct minority`)) +
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
+
+cap = "Percent minority by mean impervious land cover"
+```
+
+
+
