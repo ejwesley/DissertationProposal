@@ -34,12 +34,11 @@ KC Health CORE is a collaborative initiative between Children’s Mercy Hospital
 	\end{tabular}
 \end{table}
 
-The data were further classified into three severity levels according to the International Classification of Diseases, 9^th^ revision diagnoses codes (ICD-9~~~~) and the patient class.
-The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc.
+The data were further classified into three severity levels according to the International Classification of Diseases, 9^th^ revision diagnoses codes (ICD-9) and the patient class. The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc.
 
 ## Pediatric asthma {#ped-asthma}
 
-Asthma is a collection of symptoms that produce breathing difficulties. Asthma has been variously shown to be effected by air pressure, temperature, thunderstorms, allergens, and air pollution. Asthma occurence has been shown to be higher in individuals living close to highways and railways and other high traffic density areas. Asthma occurence also tends to be higher in people of color and among the urban poor. Few studies examine the syncronicities between these factors however.
+Asthma is a chronic inflammatory disease that is associated with a collection of symptoms that produce breathing difficulties [@Won2016]. Asthma has been variously shown to be effected by air pressure, temperature, thunderstorms, allergens, and air pollution [@Won2016; @sonejaExposureExtremeHeat2016]. Asthma occurrence has been shown to be higher in individuals living close to highways and railways and other high traffic density areas. Asthma is associate with social factors as well and occurrence also tends to be higher in people of color and among the urban poor [@Won2016]. Few studies examine the synchronicities between these factors however.
 
 ## Atmospheric data {#atmo-data}
 

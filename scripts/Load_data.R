@@ -1,11 +1,24 @@
 # ---- data ---------------------------------------------------------------
 
-summer2010 <- read_csv(here("data", "Summer2010.csv"),
-                       col_types = cols(GEOID10 = col_factor(),
-                                        Date = col_date(format = ""),
-                                        n = col_integer(),
-                                        severity = col_factor(),
-                                        median = col_double()))
+# summer2010 <- read_csv(here("data", "Summer2010.csv"),
+#                        col_types = cols(GEOID10 = col_factor(),
+#                                         Date = col_date(format = ""),
+#                                         n = col_integer(),
+#                                         severity = col_factor(),
+#                                         median = col_double()))
+
+# Read in asthma data
+
+tract.obs <- read_csv(here("data", "TractObs.csv"))
+
+# Get tract list
+
+tracts <- tract.obs %>%
+  select(GEOID10) %>%
+  distinct()
+
+write_csv(tracts, here("data", "Decennial2010", "tract_list.csv"))
+
 
 
 # Pediatric asthma rate per tract

@@ -7,29 +7,55 @@
 read_chunk(here("scripts", "Load_data.R"))
 ```
 
+```{r data}
+all.levels
+```
+
 ```{r LST-count, data, echo = FALSE}
 # Plot asthma rate by LST, not including rows with NAs
 all.levels %>% 
   drop_na() %>% 
   filter(asthma.rate > 0) %>% 
   ggplot(aes(LST, asthma.rate)) +
-  geom_bin2d() 
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
 ```
 
 ```{r min-count, data, echo = FALSE}
 all.levels %>% 
   filter(asthma.rate > 0) %>% 
   ggplot(aes(pct.min, asthma.rate)) +
-  geom_bin2d() 
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
 ```
 ```{r imp-count, data, echo = FALSE}
 all.levels %>% 
   filter(asthma.rate > 0) %>% 
-  ggplot(aes(pct.min, asthma.rate)) +
-  geom_bin2d() 
+  ggplot(aes(mean.imp, asthma.rate)) +
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
+```
+
+```{r lst-imp, data, echo = FALSE}
+all.levels %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(LST, mean.imp)) +
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
 ```
 
 ```{r lst-min, data, echo = FALSE}
-
+all.levels %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(LST, pct.min)) +
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
 ```
 
+```{r lst-min, data, echo = FALSE}
+all.levels %>% 
+  filter(asthma.rate > 0) %>% 
+  ggplot(aes(mean.imp, pct.min)) +
+  geom_bin2d() +
+  geom_smooth(se = F, color = "red")
+```

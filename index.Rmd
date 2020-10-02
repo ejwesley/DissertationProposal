@@ -13,6 +13,8 @@ bibliography: Dissertation-Proposal.bib
 ```{r include = F}
 library(bookdown)
 library(knitr)
+library(tidyverse)
+library(here)
 ```
 
 
