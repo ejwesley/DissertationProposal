@@ -8,7 +8,7 @@ output:
 header-includes:
    - \usepackage{booktabs}
 bibliography: Dissertation-Proposal.bib  
-book_filename: "Wesley_DissertationProposal"
+
 ---
 
 ```{r include = F}

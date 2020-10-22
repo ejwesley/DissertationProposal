@@ -1,0 +1,3 @@
+# Significance {#signif}
+
+The long-standing paradigm for studying urban systems was to conceptualize them as human systems superimposed upon natural systems. It has become clear that a more accurate model is that of coupled and natural systems which explicitly characterize the multidirectional and dynamic interactions between these systems. The modelling of coupled and human natural systems requires statistical techniques that unite data across spatial and temporal scales and can derive meaning over many levels of uncertainty. Improving these techniques will be key to predicting the effects of climate change on public health. Understading how human and natural systems are coupled requires modeling the couplings across spatial and temporal scales [@Liu2007a].

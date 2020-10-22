@@ -1,28 +1,4 @@
-## Weather and public health {#weather-pubhealth}
-
-
-
-@Ayres-Sampaio2014 found that hospital admissions due to asthma were positively related to high levels of $NO_2$, low NDVI, and high temperatures, however, they examined each of these variables independently in simple linear regressions. Temperature, $NO_2$, NDVI, and relative humidity are not independent of each other and in fact the authors used altitude to calculate both the air temperature and $NO_2$ estimates. Land use was also used in the $NO_2$ estimates, one type of which is vegetated which would likely be highly correlated with NDVI. Furthermore, they used six year seasonal averages of these variables.  @babinPediatricPatientAsthmarelated2007 found a positive relationship between $O_3$ and pediatric asthma but their dataset spanned only three years.
-
-## Urban infrastructure and environment {#urbenv-pubhealth}
-
-@villeneuveCohortStudyRelating2012b found that there was an inverse relationship between greenspace and mortality. Urban trees contribute to improved air quality by reducing air pollution concentrations [@nowakAirPollutionRemoval2006]. 
-
-## Social determinants of health {#soc-det}
-
-@babinPediatricPatientAsthmarelated2007 found a logarithmic relationship between pediatric asthma-related emergency departmnet visits and the percentage of children living below the poverty level but this data was aggregated to the zip code level.
-
-# Limitations of simple modeling techniques {#model-limits}
-
-
-* Missing data---cloud cover, etc.
-* Trying to combine qualitative and quantitative data types.
-* Spatial and temporal granularity
-  * (census tracts dividing the city; days, weeks, months, years) 
-  * levels of detail
-* collinearity
-
-These issues are interesting as well as problematic.
+Public health requires transdisciplinary approaches to modelling the complex systems that interact to produce variabilities in outcomes [@Trochim2006].
 
 
 "Environmental processes arise from interactions of various processes. These interactions are often occurring at various scales in space and time. Although it is often convenient to simplify such systems either by ignoring the multivariate interaction, or by assuming spatial/temporal stationarity, linearity, and Gaussianity, it is increasingly the case that the scientific questions of interest are becoming sufficiently complex that one can no longer justify such assumptions." [@wikleHierarchicalModelsEnvironmental2003]. "these data are often of differing spatial and temporal support, orientation, and alignment, relative to the process of interest" [@wikleHierarchicalModelsEnvironmental2003] "the environment encompasses many different interacting processes. It follows that one of the biggest challenges and growth areas in environmental statistics will be concerned with linking the many processes contributing to specific environmental questions of concern" [@wikleHierarchicalModelsEnvironmental2003].
