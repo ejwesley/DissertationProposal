@@ -1,10 +1,5 @@
 # Data {#data}
 
-Studying the interactions of urban systems and the relationship with public health requires both an outcome and an instance. The proposed research seeks to explore and describe pediatric asthma in the Kansas City metropolitan area as an example of the variability of public health and how that relates to the spatial and temporal variabilites and interactions of atmospheric conditions, enviromental characteristics, and social factors.
-
-Asthma is a chronic inflammatory disease that is associated with a collection of symptoms that produce breathing difficulties [@Won2016]. Asthma has been variously shown to be effected by air pressure, temperature, thunderstorms, allergens, and air pollution [@Won2016; @sonejaExposureExtremeHeat2016]. Asthma occurrence has been shown to be higher in individuals living close to highways and railways and other high traffic density areas. Asthma is associate with social factors as well and occurrence also tends to be higher in people of color and among the urban poor [@Won2016]. However, few studies examine the synchronicities between these factors.
-
-
 ## Study area {#study-area}
 
 The Kansas City metropolitan area as delineated by the United States Census Bureau is located at 39.0398$^{\circ}$N latitude and 94.5949$^{\circ}$W longitude and spans two states and six counties: Johnson and Wyandotte Counties in Kansas, and Platte, Clay, Cass, and Jackson Counties in Missouri. The Köppen climate classification is humid subtropical (Cfa), with rainfall year round, averaging 964mm annually. The annual temperature average is 12.8$^{\circ}$C, with a maximum average high of 26.1$^{\circ}$C in July and a minimum average low of -2$^{\circ}$C in January (https://en.climate-data.org/location/715044). The Kansas City metro area exhibits characteristic patterns of urban sprawl, which is generally defined as “geographic expansion over large areas, low-density land use, low land-use mix, low connectivity, and heavy reliance on automobiles relative to other modes of travel”  [@Stone2010] showing a 55 percent increase in built area between 1972 and 2001 [@Ji2008]. The Kansas City metro area  had an estimated population of 2,142,419 in 2018, a 5 percent increase from 2000. An estimated 24.2\% of the population are under the age of 18. 73.9\% of the population under the age of 18 are identified as white alone, 7.4\% as black alone, 0.3\% as American Indian alone, 3.2\% as asian alone, 0.4\% as native Hawaiian alone, and 2.6\% as some other race alone. 6.9\% of the population identify as two or more races and 11.7\% identify as hispanic or latino of any race. In 2018, 5.1\% of children under the age of 18 lived in households with income below the poverty level and 7.6\% lived in households receiving some kind of public assistance. 31.4\% live in single parent households (https://data.census.gov/cedsci).
@@ -57,6 +52,15 @@ There are two primary levels of social determinants of health for this study: in
 
 
 # Preliminary analysis {#prelim}
+
+Preliminary analysis of the Kansas City pediatric asthma data highlights some of the limitations of simple modeling techniques.
+
+
+
+
+
+
+
 
 Basic relationships between variables calculated at the census tract level for the summer (June, July, August) of 2010 (Figs. \@ref(fig:LST-count), \@ref(fig:min-count), \@ref(fig:imp-count), \@ref(fig:lst-imp), \@ref(fig:lst-min), \@ref(fig:imp-min)). LST is the median MODIS pixel value in degrees Celsius, asthma rate is the number of pediatric asthma cases per number of children, the percent minority is the percent of total residents who are non white, and the mean percent impervious is the mean NLCD percent impervious pixel value all calculate at the census tract geography. 
 
@@ -139,25 +143,5 @@ cap = "Percent minority by mean impervious land cover"
 
 
 
-@Ayres-Sampaio2014 found that hospital admissions due to asthma were positively related to high levels of $NO_2$, low NDVI, and high temperatures, however, they examined each of these variables independently in simple linear regressions. Temperature, $NO_2$, NDVI, and relative humidity are not independent of each other and in fact the authors used altitude to calculate both the air temperature and $NO_2$ estimates. Land use was also used in the $NO_2$ estimates, one type of which is vegetated which would likely be highly correlated with NDVI. Furthermore, they used six year seasonal averages of these variables.  @babinPediatricPatientAsthmarelated2007 found a positive relationship between $O_3$ and pediatric asthma but their dataset spanned only three years.
-
-## Urban infrastructure and environment {#urbenv-pubhealth}
-
-@villeneuveCohortStudyRelating2012b found that there was an inverse relationship between greenspace and mortality. Urban trees contribute to improved air quality by reducing air pollution concentrations [@nowakAirPollutionRemoval2006]. 
-
-## Social determinants of health {#soc-det}
-
-@babinPediatricPatientAsthmarelated2007 found a logarithmic relationship between pediatric asthma-related emergency departmnet visits and the percentage of children living below the poverty level but this data was aggregated to the zip code level.
-
-# Limitations of simple modeling techniques {#model-limits}
 
 
-* Missing data---cloud cover, etc.
-* Trying to combine qualitative and quantitative data types.
-* Spatial and temporal granularity
-  * (census tracts dividing the city; days, weeks, months, years) 
-  * levels of detail
-  * poor localization
-* collinearity
-
-These issues are interesting as well as problematic.
