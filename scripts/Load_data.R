@@ -1,3 +1,6 @@
+library(here)
+library(tidyverse)
+
 # ---- data ---------------------------------------------------------------
 
 summer2010 <- read_csv(here("data", "Summer2010.csv"),
@@ -49,8 +52,8 @@ race.table <- read_csv(here("data", "Decennial2010", "Race2010.csv"), skip = 1) 
          `Pct minority` = 1 - pct.maj) %>%
   select(GEOID10, `Pct minority`)
 
-
 # Calculate daily rates per tract, all severity levels
+# Include quantiles for percent minority
 
 all.levels <- summer2010 %>%
   group_by(GEOID10, Date) %>%
@@ -83,3 +86,9 @@ imp <- read_csv(here("data", "Mean_impervious.csv")) %>%
 
 all.levels <- all.levels %>%
   left_join(imp)
+
+# Quantiles for pct minority
+all.levels <- all.levels %>%
+  mutate(q = as.factor(ntile(`Pct minority`, 2)))
+
+rm(list = setdiff(ls(), "all.levels"))

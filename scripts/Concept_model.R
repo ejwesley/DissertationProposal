@@ -14,7 +14,7 @@ summer2010 <- read_csv(here("data", "Summer2010.csv"),
 
 # Males and females 17 and under
 
-age.table <- read_csv(here("data", "Decennial2010_Age", "Decennial2010_Age.csv")) %>%
+age.table <- read_csv(here("data", "Decennial2010", "Age2010.csv")) %>%
   select(GEO_ID, ends_with("2003"):ends_with("2006"), ends_with("2027"):ends_with("2030")) %>%
   filter(row_number() != 1) %>%
   mutate_at(vars(starts_with("P")), as.numeric) %>%
@@ -50,7 +50,8 @@ all.levels %>%
   filter(rate > 0) %>%
 ggplot() +
   geom_point(aes(LST, rate)) +
-  geom_smooth(aes(LST, rate), method = "lm")
+  geom_smooth(aes(LST, rate), method = "lm") +
+  ylim(0, 0.012)
 
 # Cases by date
 ggplot(all.levels) +

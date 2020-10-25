@@ -53,7 +53,7 @@ There are two primary levels of social determinants of health for this study: in
 
 # Preliminary analysis {#prelim}
 
-Preliminary analysis of the Kansas City pediatric asthma data highlights some of the limitations of simple modeling techniques.
+Preliminary analysis of the Kansas City pediatric asthma data highlights some of the limitations of simple modeling techniques. 
 
 
 
@@ -68,11 +68,19 @@ Basic relationships between variables calculated at the census tract level for t
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # Read in data from Load_data.R in scripts folder
 
-read_chunk(here("scripts", "Load_data.R"))
+source(here("scripts", "Load_data.R"), local = knitr::knit_global())
 ```
 
-```{r data}
-all.levels
+```{r LST-pctmin-quant, fig.cap = cap}
+# Plot of LST over time by quantile of pct minority
+
+all.levels %>%
+  group_by(q, Date) %>% 
+  mutate(m = median(`Median LST`)) %>% 
+  ungroup() %>% 
+  ggplot() +
+  geom_line(aes(Date, m, color = q)) +
+  facet_wrap(~ month(Date), scales = "free_x", ncol = 1)
 ```
 
 
@@ -139,7 +147,7 @@ cap = "Percent minority by mean impervious land cover"
 ```
 
 
-## Weather and public health {#weather-pubhealth}
+
 
 
 
