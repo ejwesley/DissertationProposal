@@ -7,8 +7,11 @@ output:
     toc: yes
 header-includes:
    - \usepackage{booktabs}
+   - \usepackage{lineno}
+   - \linenumbers
 bibliography: Dissertation-Proposal.bib  
-
+linestretch: 2
+indent: true
 ---
 
 ```{r include = F}
