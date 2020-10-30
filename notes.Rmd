@@ -1,1 +1,44 @@
 "several studies [13-15] have noted increased asthma morbidity triggered by respiratory viral infections (e.g., colds) that occur during late summer and early autumn. "[@babinPediatricPatientAsthmarelated2007]
+
+limitations of other studies:
+
+spatial and temporal aggregation
+don't consider variation of relationships by social factors
+don't consider feedbacks between built env. and atmosphere
+lack of hierarchy
+
+"A research approach that focuses on the relationship of individual risk factors related to asthma is unlikely to capture the complex and multidimensional factors that contribute to the variation in asthma prevalence and morbidity. Research is needed that incorporates a life course, cumulative risk perspective and that seeks to integrate how multiple risks and resources linked to the individual, family, housing, neighborhood, and societal level relate to each other and combine to affect childhood asthma." [@williamsSocialDeterminantsTaking2009]
+
+
+"Environmental processes arise from interactions of various processes. These interactions are often occurring at various scales in space and time. Although it is often convenient to simplify such systems either by ignoring the multivariate interaction, or by assuming spatial/temporal stationarity, linearity, and Gaussianity, it is increasingly the case that the scientific questions of interest are becoming sufficiently complex that one can no longer justify such assumptions." [@wikleHierarchicalModelsEnvironmental2003]. "these data are often of differing spatial and temporal support, orientation, and alignment, relative to the process of interest" [@wikleHierarchicalModelsEnvironmental2003] "the environment encompasses many different interacting processes. It follows that one of the biggest challenges and growth areas in environmental statistics will be concerned with linking the many processes contributing to specific environmental questions of concern" [@wikleHierarchicalModelsEnvironmental2003].
+
+"THere are varying intervals of time between human-nature interactions and their ecological and socioeconomic effects." [@Liu2007a]
+
+
+Public health requires transdisciplinary approaches to modelling the complex systems that interact to produce variabilities in outcomes [@Trochim2006].
+
+"Future multi-level studies considering individuals nested within neighborhoods would limit false ecological inferences" [@Uejio2011]
+
+
+
+"Studying CHANs requires a new paradigm that emphasizes hierarchical couplings of natural and human sysems across organizational, spatial, and temporal scales." [@Liu2007a]
+
+"It is important to note that there was no expectation of high correlations with the environmental variables because the exacerbation of asthma symptoms depends on several other external factors (e.g., indoor pollution, viral infections) and host factors (e.g., genetics)" [@Ayres-Sampaio2014]
+
+* Missing data---cloud cover, etc.
+* Trying to combine qualitative and quantitative data types.
+* Spatial and temporal granularity
+  * (census tracts dividing the city; days, weeks, months, years) 
+  * levels of detail
+  * poor localization
+* collinearity
+
+##### Quotes 
+
+Hierarchical models connect a series of conditional models with probability rules and make it possible to account for uncertainties, use first principles, and simiplify modeling specifications [@wikleHierarchicalModelsEnvironmental2003]. Joint distributions of covariates can be separaated into a series of conditional models [@wikleHierarchicalModelsEnvironmental2003]. 
+
+"as the level of complexity increases (or "subjective" prior information is included) the Bayesian paradigm is usually necessary" [@wikleHierarchicalModelsEnvironmental2003]. 
+
+"hierarchical modeling provides a framework by which to simplify complicated environmental systems, so that uncertainty can be linked in a coherent fashion" [@wikleHierarchicalModelsEnvironmental2003]. 
+
+"CHANS can be concepturalized as entities with nested hierarchies. In CHANS, people and nature interact reciprocally across diverse organizational levels. They form complex webs of interaction that are embedded in each other." [@Liu2007a]

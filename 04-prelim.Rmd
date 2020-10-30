@@ -1,149 +1,194 @@
-# Data {#data}
-
-## Study area {#study-area}
-
-The Kansas City metropolitan area as delineated by the United States Census Bureau is located at 39.0398$^{\circ}$N latitude and 94.5949$^{\circ}$W longitude and spans two states and six counties: Johnson and Wyandotte Counties in Kansas, and Platte, Clay, Cass, and Jackson Counties in Missouri. The Köppen climate classification is humid subtropical (Cfa), with rainfall year round, averaging 964mm annually. The annual temperature average is 12.8$^{\circ}$C, with a maximum average high of 26.1$^{\circ}$C in July and a minimum average low of -2$^{\circ}$C in January (https://en.climate-data.org/location/715044). The Kansas City metro area exhibits characteristic patterns of urban sprawl, which is generally defined as “geographic expansion over large areas, low-density land use, low land-use mix, low connectivity, and heavy reliance on automobiles relative to other modes of travel”  [@Stone2010] showing a 55 percent increase in built area between 1972 and 2001 [@Ji2008]. The Kansas City metro area  had an estimated population of 2,142,419 in 2018, a 5 percent increase from 2000. An estimated 24.2\% of the population are under the age of 18. 73.9\% of the population under the age of 18 are identified as white alone, 7.4\% as black alone, 0.3\% as American Indian alone, 3.2\% as asian alone, 0.4\% as native Hawaiian alone, and 2.6\% as some other race alone. 6.9\% of the population identify as two or more races and 11.7\% identify as hispanic or latino of any race. In 2018, 5.1\% of children under the age of 18 lived in households with income below the poverty level and 7.6\% lived in households receiving some kind of public assistance. 31.4\% live in single parent households (https://data.census.gov/cedsci).
-
-## Pediatric asthma {#asthma-data}
-
-KC Health CORE is a collaborative initiative between Children’s Mercy Hospital and the Center for Economic Information at the University of Missouri, Kansas City created to investigate the geographic disparity of pediatric health outcomes. This analysis will use pediatric asthma data from 2001-2012 geocoded to street centerlines based on the patients’ home address at the time of admission. Although the dataset contains information on the years 1999 and 2001, the observations seem inconsistent with the remaining years. There is a good possibility that this is due to differences in data procedures those years will not be considered. The data come from a retrospective collection of pediatric asthma encounters within the Children’s Mercy Hospital network. In this instance children ages 2-18 are considered. The original medical records were formatted according to Table \@ref(tab:original-asthma-data).
-
-\begin{table}
-	\caption{Structure of the original pediatric asthma data records submitted by CMH to UMKC-CEI. \label{tab:original-asthma-data}}
-	\centering
-	\begin{tabular}{ll}
-		\toprule
-		Category & Attributes \\
-		\midrule
-		Diagnosis & Date of admission \\
-		& ICD-9 code \\
-		& Event account number \\
-		& Patient medical record number (MRN) \\
-		& Patient residential address \\
-		\midrule
-		Demographics & Birthdate \\
-		& Sex \\
-		& Race \\
-		& Ethnicity \\
-		\midrule
-		Visit characteristics & Payment type \\
-		& Patient class \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-The data were further classified into three severity levels with one being the lowest and 3 being the highest according to the International Classification of Diseases, 9^th^ revision diagnoses codes (ICD-9) and the patient class. The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc. See @kaneInterdisciplinaryHealthDisparities2020 for more details.
-
-## Atmospheric data {#atmo-data}
-
-Atmospheric data include both station and satellite observations. The spatial variation of meteorological data will be assessed using remotely-sensed data including land surface temperature (LST) and other variables to be determined based on availability. LST from the Moderate Resolution Imaging Spectroradiometer (MODIS) are available daily at 1 km spatial resolution, with two passovers during daylight---once in the morning and once in the afternoon---and two during the nighttime. Cloud cover produces low-quality images so the 8-day composite images may be a suitable alternative depending on the desired temporal resolution. This data can be accessed and manipulated using the Google Earth Engine analysis platform (https://earthengine.google.com/). Derived variables may include: LST anomolies relative to the mean and the diurnal temperature range. 
-
-Station data were retrieved from the NOAA National Centers for Environmental Information for the Kansas City Downtown Airport, MO, US. The station is located at 39.1208$^{\circ}$N, 94.5969$^{\circ}$W. Daily precipitation totals, maximum temperature, and minimum temperature were retrieved for all dates between 1900-01-01 and 2019-10-19. Daily average wind speed, direction of fastest 2-minute wind, and direction of fastest 5-minute wind were retrieved for the years 2000-2012. Daily maximum 8-hour ozone concentration and daily mean PM2.5 concentration were retrieved from the EPA for the JFK Community Center in Kansas City, KS, US, located at 39.117219$^{\circ}$N, 94.635605$^{\circ}$W for the years 2000-2012. These data represent the daily temporal variability of atmospheric conditions for the entire study area although there is certainly unaccounted for spatial variability. Derived variables may include: daily percentile values, number of days in a row that values exceed a predetermined threshold value (e.g. 95th percentile high temperature days to indicate a heat wave), diurnal rangess, and seasonal trends.
-
-## Environmental data {#environ-data}
-
-Land cover data comes from the Mid-America Regional Council (MARC) created the Natural Resources Inventory (NRI) map of Greater Kansas City with an object-based classification, using SPOT data from May, June, and August of 2012 as well as ancillary data (LiDAR, hydrography, parcels/zoning class, transportation centerlines, streamlines, and floodplains). The resulting land cover map has an estimated accuracy of 83 - 91\% for the Level I classifications of impervious, barren, vegetated, and water. Impervious comprises buildings and other impervious surfaces, barren comprises land with 0 - 10\% vegetated fraction, vegetated comprises land with 10-100\% vegetated fraction, and water comprises water features. The spatial resolution of the NRI landcover map is 2.5 m and the extent is the 4,423 square miles that comprise the 9 county Kansas City metropolitan area [@Mid-2013]. An alternative or complementary land cover dataset is the National Land Cover Dataset (NLCD) produced by the United States Geological Survey (USGS), a 30 m resolution land cover map, including percent of impervious surface, based on Landsat imagery (http://www.mrlc.gov). A more specifically urban-oriented classification system is comprised of local climate zones (LCZs), "regions of uniform surface cover, structure, material, and human activity that span hundreds of meters to several kilometers in horizontal scale" [@stewartLocalClimateZones2012]. The scheme delineates 17 separate LCZs, each with a distinct temperature regime originating from a relatively homogenous collection of surface properties, primarily the density and height of roughness objects o[@stewartLocalClimateZones2012].
-
-Additionally, spatial features from the built environment will be acquired for the study area, including, but not limited to: street and highway network, rail network, and power infrastructure. Traffic density data will also be acquired if possible. Derived variables may include density of or proximity to infrastructure networks or  greenspace. 
-
-## Social determinants of health data {#soc-data}
-
-There are two primary levels of social determinants of health for this study: individual and community. Each observation of pediatric asthma is coded for sex, race, age, ethnicity, and payment type---specifically Medicaid or other state coverage, private insurance, or self pay. Community-level characteristics come from the United States Census (https://data.census.gov/cedsci/). Variables include the percent of minority residents, percent of households below the poverty level, and the percent of owner-occupied households. While the block group is the highest resolution of census geography for which this information is available, the unit of analysis will likely be the census tract due to the geographic sparsity of daily pediatric asthma observations. The census tract is roughly equivalent to a neighborhood and the associated data provide an appropriate proxy for community structure.
-
-
 # Preliminary analysis {#prelim}
 
-Preliminary analysis of the Kansas City pediatric asthma data highlights some of the limitations of simple modeling techniques. 
+Some preliminary analysis highlights some of the limitations and challenges. The asthma data are characterized by weekly and seasonal trends that must be accounted for (Fig. \@ref(fig:acf)). Additionally, the asthma data is nonstationary with counts increasing every year (Fig. \@ref(fig:ann-counts)).
 
+```{r acf, fig.cap=cap}
+include_graphics("images/acf.png")
 
-
-
-
-
-
-
-Basic relationships between variables calculated at the census tract level for the summer (June, July, August) of 2010 (Figs. \@ref(fig:LST-count), \@ref(fig:min-count), \@ref(fig:imp-count), \@ref(fig:lst-imp), \@ref(fig:lst-min), \@ref(fig:imp-min)). LST is the median MODIS pixel value in degrees Celsius, asthma rate is the number of pediatric asthma cases per number of children, the percent minority is the percent of total residents who are non white, and the mean percent impervious is the mean NLCD percent impervious pixel value all calculate at the census tract geography. 
-
-```{r setup, include = FALSE, cache = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
-# Read in data from Load_data.R in scripts folder
-
-source(here("scripts", "Load_data.R"), local = knitr::knit_global())
+cap <- "The autocorrelation function shows the weekly and seasonal trends in the asthma data."
 ```
 
-```{r LST-pctmin-quant, fig.cap = cap}
+```{r ann-counts, fig.cap=cap}
+include_graphics("images/monthly_counts.pdf")
+
+cap = "Asthma counts are increasing every year."
+```
+
+These trends are lessened when considering only the level 3 severity but this limits statistical power and level 2 severity is also considered an acute care visit (Fig. \@ref(fig:trend-sev)).
+
+```{r trend-sev, fig.cap=cap, fig.show = "hold", out.width = "50%", fig.align = "default"}
+include_graphics("images/monthly_counts_severity.pdf")
+include_graphics("images/wday_counts_severity.pdf")
+
+cap <-  "Level 3 severity is less influenced by trends."
+```
+
+Regardless of trends, there are clear anomalies that should be investigated (Fig. \@ref(fig:anomalies)).
+
+```{r anomalies, fig.cap=cap}
+include_graphics("images/avg_count.pdf")
+
+cap <- "Daily counts by year with 12-year average. There are clear anomalous asthma events."
+```
+
+```{r setup, include = FALSE, cache = FALSE}
+# knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# # Read in data from Load_data.R in scripts folder
+# 
+# source(here("scripts", "Load_data.R"), local = knitr::knit_global())
+```
+
+
+
+
+
+```{r include=F}
+# Count or rate? Comparing mean and variance for both.
+# all.levels %>% 
+#   group_by(GEOID10) %>% 
+#   summarise(mean = mean(count),
+#             var = var(count)) %>% 
+#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
+# ggplot() +
+#   geom_col(aes(x = GEOID10, y = value, color = Measure), position = position_dodge())
+# 
+# all.levels %>% 
+#   group_by(Date) %>% 
+#   summarise(mean = mean(count),
+#             var = var(count)) %>% 
+#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
+#   ggplot() +
+#   geom_line(aes(x = Date, y = value, color = Measure))
+# 
+# all.levels %>% 
+#   filter(count != 0) %>% 
+# ggplot() +
+#   geom_histogram(aes((count)))
+# 
+# all.levels %>% 
+#   group_by(Date) %>% 
+#   summarise(mean = mean(`Asthma rate`),
+#             var = var(`Asthma rate`)) %>% 
+#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
+#   ggplot() +
+#   geom_line(aes(x = Date, y = value, color = Measure))
+# 
+# all.levels %>% 
+#   group_by(GEOID10) %>% 
+#   summarise(mean = mean(`Asthma rate`),
+#             var = var(`Asthma rate`)) %>% 
+#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
+# ggplot() +
+#   geom_col(aes(x = GEOID10, y = value, color = Measure), position = position_dodge())
+# 
+# all.levels %>% 
+#   filter(count != 0) %>% 
+# ggplot() +
+#   geom_histogram(aes((`Asthma rate`)))
+```
+```{r include = F}
+# ggplot(all.levels) +
+#   geom_boxplot(aes(`Pct minority`, factor(count)))
+# 
+# ggplot(all.levels) +
+#   geom_point(aes(`Pct minority`, `Asthma rate`))
+# 
+# ggplot(all.levels) +
+#   geom_boxplot(aes(mean.imp, factor(count)))
+# 
+# ggplot(all.levels) +
+#   geom_point(aes(mean.imp, `Asthma rate`))
+# 
+# ggplot(all.levels) +
+#   geom_point(aes(mean.imp, `Pct minority`)) + 
+#   geom_smooth(aes(mean.imp, `Pct minority`), method = "lm")
+# 
+# ggplot(all.levels) +
+#   geom_point(aes(mean.imp, `Median LST`)) + 
+#   geom_smooth(aes(mean.imp, `Median LST`), method = "lm")
+# 
+# ggplot(all.levels) +
+#   geom_boxplot(aes(`Median LST`, factor(count)))
+```
+
+
+
+```{r LST-pctmin-quant, fig.cap = cap, echo = F}
 # Plot of LST over time by quantile of pct minority
 
-all.levels %>%
-  group_by(q, Date) %>% 
-  mutate(m = median(`Median LST`)) %>% 
-  ungroup() %>% 
-  ggplot() +
-  geom_line(aes(Date, m, color = q)) +
-  facet_wrap(~ month(Date), scales = "free_x", ncol = 1)
+# all.levels %>%
+#   group_by(q, Date) %>% 
+#   mutate(m = median(`Median LST`)) %>% 
+#   ungroup() %>% 
+#   ggplot() +
+#   geom_line(aes(Date, m, color = q)) +
+#   ylab("Median LST per census tract") +
+#   facet_wrap(~ month(Date), scales = "free", ncol = 1)
+# 
+# cap <- "Median LST per census tract, summer 2010, by quantiles of percent minority residents."
 ```
 
 
 ```{r LST-count,  fig.cap = cap}
 # Plot asthma rate by LST, not including rows with NAs
-all.levels %>% 
-  drop_na() %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Median LST`, `Asthma rate`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap <- "Daily pediatric asthma count by median daily LST"
+# all.levels %>% 
+#   drop_na() %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Median LST`, `Asthma rate`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap <- "Daily pediatric asthma count by median daily LST"
 ```
 
 ```{r min-count, fig.cap = cap}
-all.levels %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Pct minority`, `Asthma rate`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap = "Daily pediatric asthma count by percent minority"
+# all.levels %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Pct minority`, `Asthma rate`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap = "Daily pediatric asthma count by percent minority"
 ```
 
 ```{r imp-count, fig.cap = cap}
-all.levels %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Mean pct impervious`, `Asthma rate`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap = "Daily pediatric asthma count by mean percent impervious land cover"
+# all.levels %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Mean pct impervious`, `Asthma rate`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap = "Daily pediatric asthma count by mean percent impervious land cover"
 ```
 
 ```{r lst-imp, fig.cap = cap}
-all.levels %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Mean pct impervious`, `Median LST`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap = "Daily median LST by mean percent impervious land cover"
+# all.levels %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Mean pct impervious`, `Median LST`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap = "Daily median LST by mean percent impervious land cover"
 ```
 
 ```{r lst-min, fig.cap = cap}
-all.levels %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Median LST`, `Pct minority`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap = "Percent minority by daily median LST"
+# all.levels %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Median LST`, `Pct minority`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap = "Percent minority by daily median LST"
 ```
 
 ```{r imp-min, fig.cap = cap}
-all.levels %>% 
-  filter(`Asthma rate` > 0) %>% 
-  ggplot(aes(`Mean pct impervious`, `Pct minority`)) +
-  geom_bin2d() +
-  geom_smooth(se = F, color = "red")
-
-cap = "Percent minority by mean impervious land cover"
+# all.levels %>% 
+#   filter(`Asthma rate` > 0) %>% 
+#   ggplot(aes(`Mean pct impervious`, `Pct minority`)) +
+#   geom_bin2d() +
+#   geom_smooth(se = F, color = "red")
+# 
+# cap = "Percent minority by mean impervious land cover"
 ```
 
 

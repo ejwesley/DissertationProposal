@@ -1,10 +1,11 @@
 ---
-title: "Dissertation Proposal"
+title: "Health and weather and stuff: A proposal"
 author: "Elizabeth Wesley"
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_document2:
-    toc: yes
+     toc: false
+     extra_dependencies: "subfig"
 header-includes:
    - \usepackage{booktabs}
    - \usepackage{lineno}
@@ -19,6 +20,9 @@ library(bookdown)
 library(knitr)
 library(tidyverse)
 library(here)
+library(lubridate)
+
+knitr::opts_chunk$set(out.width="70%", fig.align='center', echo = F)
 ```
 
 

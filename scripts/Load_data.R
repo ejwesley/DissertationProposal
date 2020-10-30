@@ -54,6 +54,7 @@ race.table <- read_csv(here("data", "Decennial2010", "Race2010.csv"), skip = 1) 
 
 # Calculate daily rates per tract, all severity levels
 # Include quantiles for percent minority
+# calculate rate per 100 children
 
 all.levels <- summer2010 %>%
   group_by(GEOID10, Date) %>%
@@ -61,7 +62,7 @@ all.levels <- summer2010 %>%
             `Median LST` = first(median)) %>%
   left_join(age.table, by = c("GEOID10" = "GEO_ID")) %>%
   left_join(race.table) %>%
-  mutate(`Asthma rate` = count / n.kids,
+  mutate(`Asthma rate` = count / (n.kids / 100),
          GEOID10 = as.factor(GEOID10)) %>%
   ungroup()
 
@@ -89,6 +90,6 @@ all.levels <- all.levels %>%
 
 # Quantiles for pct minority
 all.levels <- all.levels %>%
-  mutate(q = as.factor(ntile(`Pct minority`, 2)))
+  mutate(q = as.factor(ntile(`Pct minority`, 3)))
 
 rm(list = setdiff(ls(), "all.levels"))

@@ -1,0 +1,86 @@
+# Data {#data}
+
+## Study area {#study-area}
+
+The Kansas City metropolitan area as delineated by the United States Census Bureau is located at 39.0398$^{\circ}$N latitude and 94.5949$^{\circ}$W longitude and spans two states and six counties: Johnson and Wyandotte Counties in Kansas, and Platte, Clay, Cass, and Jackson Counties in Missouri. The Köppen climate classification is humid subtropical (Cfa), with rainfall year round, averaging 964mm annually. The annual temperature average is 12.8$^{\circ}$C, with a maximum average high of 26.1$^{\circ}$C in July and a minimum average low of -2$^{\circ}$C in January (https://en.climate-data.org/location/715044). The Kansas City metro area exhibits characteristic patterns of urban sprawl (Fig. \@ref(fig:KC)), which is generally defined as “geographic expansion over large areas, low-density land use, low land-use mix, low connectivity, and heavy reliance on automobiles relative to other modes of travel”  [@Stone2010] showing a 55 percent increase in built area between 1972 and 2001 [@Ji2008]. The Kansas City metro area  had an estimated population of 2,142,419 in 2018, a 5 percent increase from 2000. An estimated 24.2\% of the population are under the age of 18. 73.9\% of the population under the age of 18 are identified as white alone, 7.4\% as black alone, 0.3\% as American Indian alone, 3.2\% as asian alone, 0.4\% as native Hawaiian alone, and 2.6\% as some other race alone. 6.9\% of the population identify as two or more races and 11.7\% identify as Hispanic or latino of any race. In 2018, 5.1\% of children under the age of 18 lived in households with income below the poverty level and 7.6\% lived in households receiving some kind of public assistance. 31.4\% live in single parent households (https://data.census.gov/cedsci).
+
+```{r KC, fig.cap=cap, fig.pos="h"}
+include_graphics("images/KC.pdf")
+
+cap <- "The Kansas City metro area exhibits classic patterns of urban sprawl."
+```
+
+
+## Pediatric asthma {#asthma-data}
+
+KC Health CORE is a collaborative initiative between Children’s Mercy Hospital and the Center for Economic Information at the University of Missouri, Kansas City created to investigate the geographic disparity of pediatric health outcomes. This analysis will use pediatric asthma data from 2001-2012 geocoded to street centerlines based on the patients’ home address at the time of admission (Fig. \@ref(fig:asthma)). Although the dataset contains information on the years 1999 and 2001, the observations seem inconsistent with the remaining years. There is a good possibility that this is due to differences in data procedures those years will not be considered. The data come from a retrospective collection of pediatric asthma encounters within the Children’s Mercy Hospital network. In this instance children ages 2-18 are considered. The original medical records were formatted according to Table \@ref(tab:original-asthma-data).
+
+\begin{table}
+	\caption{Structure of the original pediatric asthma data records submitted by CMH to UMKC-CEI. \label{tab:original-asthma-data}}
+	\centering
+	\begin{tabular}{ll}
+		\toprule
+		Category & Attributes \\
+		\midrule
+		Diagnosis & Date of admission \\
+		& ICD-9 code \\
+		& Event account number \\
+		& Patient medical record number (MRN) \\
+		& Patient residential address \\
+		\midrule
+		Demographics & Birthdate \\
+		& Sex \\
+		& Race \\
+		& Ethnicity \\
+		\midrule
+		Visit characteristics & Payment type \\
+		& Patient class \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+The data were further classified into three severity levels with one being the lowest and 3 being the highest according to the International Classification of Diseases, 9^th^ revision diagnoses codes (ICD-9) and the patient class. The patient class records both the location and the type of treatment received by the patient–e.g. controlled vs. acute care, inpatient vs. outpatient, etc. See @kaneInterdisciplinaryHealthDisparities2020 for more details.
+
+```{r asthma, fig.cap=cap, fig.pos="h"}
+include_graphics("images/asthma_heatmap.pdf")
+
+cap <- "Heat map of asthma observations."
+```
+
+
+## Atmospheric data {#atmo-data}
+
+Atmospheric data include both station and satellite observations. The spatial variation of meteorological data will be assessed using remotely-sensed data including land surface temperature (LST) (Fig. \@ref(fig:LST)) and other variables to be determined based on availability. LST from the Moderate Resolution Imaging Spectroradiometer (MODIS) are available daily at 1 km spatial resolution, with two passovers during daylight---once in the morning and once in the afternoon---and two during the nighttime. Cloud cover produces low-quality images so the 8-day composite images may be a suitable alternative depending on the desired temporal resolution. This data can be accessed and manipulated using the Google Earth Engine analysis platform (https://earthengine.google.com/). Derived variables may include: LST anomalies relative to the mean and the diurnal temperature range. 
+
+Station data were retrieved from the NOAA National Centers for Environmental Information for the Kansas City Downtown Airport, MO, US. The station is located at 39.1208$^{\circ}$N, 94.5969$^{\circ}$W. Daily precipitation totals, maximum temperature, and minimum temperature were retrieved for all dates between 1900-01-01 and 2019-10-19. Daily average wind speed, direction of fastest 2-minute wind, and direction of fastest 5-minute wind were retrieved for the years 2000-2012. Daily maximum 8-hour ozone concentration and daily mean PM2.5 concentration were retrieved from the EPA for the JFK Community Center in Kansas City, KS, US, located at 39.117219$^{\circ}$N, 94.635605$^{\circ}$W for the years 2000-2012. These data represent the daily temporal variability of atmospheric conditions for the entire study area although there is certainly unaccounted for spatial variability. Derived variables may include: daily percentile values, number of days in a row that values exceed a predetermined threshold value (e.g. 95$^{th}$ percentile high temperature days to indicate a heat wave), diurnal ranges, and seasonal trends.
+
+```{r LST, fig.cap=cap, fig.pos="h"}
+include_graphics("images/LST.pdf")
+
+cap <- "LST calculated from Landsat (30 m) shows the UHI in Kansas City."
+```
+
+
+## Environmental data {#environ-data}
+
+Land cover data comes from the Mid-America Regional Council (MARC) created the Natural Resources Inventory (NRI) map of Greater Kansas City with an object-based classification, using SPOT data from May, June, and August of 2012 as well as ancillary data (LiDAR, hydrography, parcels/zoning class, transportation centerlines, streamlines, and floodplains). The resulting land cover map has an estimated accuracy of 83 - 91\% for the Level I classifications of impervious, barren, vegetated, and water. Impervious comprises buildings and other impervious surfaces, barren comprises land with 0 - 10\% vegetated fraction, vegetated comprises land with 10-100\% vegetated fraction, and water comprises water features. The spatial resolution of the NRI land cover map is 2.5 m and the extent is the 4,423 square miles that comprise the 9 county Kansas City metropolitan area [@Mid-2013]. An alternative or complementary land cover dataset is the National Land Cover Dataset (NLCD) produced by the United States Geological Survey (USGS), a 30 m resolution land cover map, including percent of impervious surface, based on Landsat imagery (http://www.mrlc.gov). A more specifically urban-oriented classification system is comprised of local climate zones (LCZs), "regions of uniform surface cover, structure, material, and human activity that span hundreds of meters to several kilometers in horizontal scale" [@stewartLocalClimateZones2012]. The scheme delineates 17 separate LCZs, each with a distinct temperature regime originating from a relatively homogeneous collection of surface properties, primarily the density and height of roughness objects [@chingWUDAPTUrbanWeather2018].
+
+Additionally, spatial features from the built environment will be acquired for the study area, including, but not limited to: street and highway network, rail network, and power infrastructure. Traffic density data will also be acquired if possible. Derived variables may include density of or proximity to infrastructure networks or greenspace. 
+
+```{r green, fig.cap=cap, fig.pos="h"}
+include_graphics("images/vegmap.pdf")
+
+cap <- "Binary map of vegetated and non-vegetated surfaces from the MARC NRI."
+```
+
+
+## Social determinants of health data {#soc-data}
+
+There are two primary levels of social determinants of health for this study: individual and community. Each observation of pediatric asthma is coded for sex, race, age, ethnicity, and payment type---specifically Medicaid or other state coverage, private insurance, or self pay. Community-level characteristics come from the United States Census (https://data.census.gov/cedsci/) (Fig. \@ref(fig:med-income)). Variables include the percent of minority residents, percent of households below the poverty level, and the percent of owner-occupied households. While the block group is the highest resolution of census geography for which this information is available, the unit of analysis will likely be the census tract due to the geographic sparsity of daily pediatric asthma observations. The census tract is roughly equivalent to a neighborhood and the associated data provide an appropriate proxy for community structure.
+
+```{r med-income, fig.cap=cap, fig.pos="h"}
+include_graphics("images/med_income.pdf")
+
+cap <- "Median income per census tract."
+```
+
