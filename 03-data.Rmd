@@ -7,7 +7,7 @@ The Kansas City metropolitan area as delineated by the United States Census Bure
 ```{r KC, fig.cap=cap, fig.pos="h"}
 include_graphics("images/KC.pdf")
 
-cap <- "The Kansas City metro area exhibits classic patterns of urban sprawl."
+cap <- "The Kansas City metro area exhibits classic patterns of urban sprawl. True-color composite image from Landsat (30 m) June 6, 2011."
 ```
 
 
@@ -44,20 +44,20 @@ The data were further classified into three severity levels with one being the l
 ```{r asthma, fig.cap=cap, fig.pos="h"}
 include_graphics("images/asthma_heatmap.pdf")
 
-cap <- "Heat map of asthma observations."
+cap <- "Asthma observations from 2002 to 2012. Points are partially transparent to both show spatial density of points and to preserve patient privacy."
 ```
 
 
 ## Atmospheric data {#atmo-data}
 
-Atmospheric data include both station and satellite observations. The spatial variation of meteorological data will be assessed using remotely-sensed data including land surface temperature (LST) (Fig. \@ref(fig:LST)) and other variables to be determined based on availability. LST from the Moderate Resolution Imaging Spectroradiometer (MODIS) are available daily at 1 km spatial resolution, with two passovers during daylight---once in the morning and once in the afternoon---and two during the nighttime. Cloud cover produces low-quality images so the 8-day composite images may be a suitable alternative depending on the desired temporal resolution. This data can be accessed and manipulated using the Google Earth Engine analysis platform (https://earthengine.google.com/). Derived variables may include: LST anomalies relative to the mean and the diurnal temperature range. 
+Atmospheric data include both station and satellite observations. The spatial variation of meteorological data will be assessed using remotely-sensed data including land surface temperature (LST) (Fig. \@ref(fig:LST)) and other variables to be determined based on availability. LST from the Moderate Resolution Imaging Spectroradiometer (MODIS) are available daily at 1 km spatial resolution, with two passovers during daylight---once in the morning and once in the afternoon---and two during the nighttime. Cloud cover produces low-quality images so the 8-day composite images may be a suitable alternative depending on the desired temporal resolution. However the composite images bias LST and increase the magnitude of the surface urban heat island (SUHI), impacts which vary seasonally [@Hu2013]. This data can be accessed and manipulated using the Google Earth Engine analysis platform (https://earthengine.google.com/). Derived variables may include: LST anomalies relative to the mean and the diurnal temperature range. 
 
 Station data were retrieved from the NOAA National Centers for Environmental Information for the Kansas City Downtown Airport, MO, US. The station is located at 39.1208$^{\circ}$N, 94.5969$^{\circ}$W. Daily precipitation totals, maximum temperature, and minimum temperature were retrieved for all dates between 1900-01-01 and 2019-10-19. Daily average wind speed, direction of fastest 2-minute wind, and direction of fastest 5-minute wind were retrieved for the years 2000-2012. Daily maximum 8-hour ozone concentration and daily mean PM2.5 concentration were retrieved from the EPA for the JFK Community Center in Kansas City, KS, US, located at 39.117219$^{\circ}$N, 94.635605$^{\circ}$W for the years 2000-2012. These data represent the daily temporal variability of atmospheric conditions for the entire study area although there is certainly unaccounted for spatial variability. Derived variables may include: daily percentile values, number of days in a row that values exceed a predetermined threshold value (e.g. 95$^{th}$ percentile high temperature days to indicate a heat wave), diurnal ranges, and seasonal trends.
 
 ```{r LST, fig.cap=cap, fig.pos="h"}
 include_graphics("images/LST.pdf")
 
-cap <- "LST calculated from Landsat (30 m) shows the UHI in Kansas City."
+cap <- "LST calculated from Landsat (30 m) June 6, 2011 shows the UHI in Kansas City."
 ```
 
 
@@ -70,7 +70,7 @@ Additionally, spatial features from the built environment will be acquired for t
 ```{r green, fig.cap=cap, fig.pos="h"}
 include_graphics("images/vegmap.pdf")
 
-cap <- "Binary map of vegetated and non-vegetated surfaces from the MARC NRI."
+cap <- "Binary map of vegetated and non-vegetated surfaces from the MARC NRI (2.5 m)."
 ```
 
 
@@ -81,6 +81,6 @@ There are two primary levels of social determinants of health for this study: in
 ```{r med-income, fig.cap=cap, fig.pos="h"}
 include_graphics("images/med_income.pdf")
 
-cap <- "Median income per census tract."
+cap <- "Median income per census tract from the 2010 United States Decennial Census."
 ```
 
