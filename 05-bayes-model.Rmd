@@ -7,39 +7,63 @@ A zero-inflated Poisson model is appropriate for the pediatric asthma counts. Po
 #https://math.usu.edu/jrstevens/biostat/projects2013/rep_ZIP.pdf
 ```
 
-$$P(Y_i=y_i|x_i,z_i)=
+\begin{equation}
+P(Y_i=y_i|x_i,z_i)=
 \left.\begin{cases}
-\psi_i+(1-\psi_i)e^{-\mu_i} & \text{if } y_i=0 \\
-(1-\psi_i)\frac{e^{-\mu_i}\mu_i^{y_i}}{y_i!} & \text{if } y_i > 0 \\
-\end{cases}\right\}$$
-where $\mu_i$ is the conditional mean and $\psi_i$ is the probability that observation $i$ is characterized by the zero-count process, written as 
-$$\psi_i=F(z_i'\gamma) $$
+\psi_i+(1-\psi_i)e^{-\lambda_i} & \text{if } y_i=0,  \text{ zero-count process}\\
+(1-\psi_i)\frac{e^{-\lambda_i}\lambda_i^{y_i}}{y_i!} & \text{if } y_i > 0, \text{Poisson process} \\
+\end{cases}
+(\#eq:poisson)
+\end{equation}
+
+where $\lambda_i$ is the conditional mean count per space-time interval (time period and census tract), otherwise known as the rate parameter, and $\psi_i$ is the probability that observation $i$ is characterized by the zero-count process, written as: 
+
+\begin{equation}
+\psi_i=F(z_i'\gamma) 
+(\#eq:zero-count)
+\end{equation}
+
 where $z_i$ is a vector of covariates and $\gamma$ is the vector of coefficients of a logit or probit model. 
 
-Another option is to standardize the counts by the number of children, calculating the effective asthma rate per spatial area per day. The rate is still zero inflated but accounts for the differing number of children per area and transforms the count into a continuous dependent variable. __This clearly needs to be expanded upon.__
+Regardless of whether the raw counts are used or if they are standardized by calculating the effective asthma rate per spatial area per day, the dependent variable is still the result of a Poisson process. Although the rate will not be an integar value it will still be a discrete value and therefore appropriate to be modelled as a count.
 
-Many researchers acknowledge the necessity of a hierarchical approach to modeling public health data [@brewerDoesNeighborhoodSocial2017; @Liu2007a; @Uejio2011; @williamsSocialDeterminantsTaking2009; @bestComparisonBayesianSpatial2005]. Individuals are nested within neighborhoods which are nested in urban areas. The levels of the hierarchy are similar in their spatial and temporal scales and interact with higher and lower levels in systematic ways, where the higher levels act as constraints and the lower levels as noise [@costanzaModelingComplexEcological1993a]. Failure to model the non-linear variability in the lower levels can lead to significant aggregation error [@costanzaModelingComplexEcological1993a]. Furthermore, hierarchical models simplify complicated systems by separating joint distributions of covariates into separate conditional models which are linked by probability rules with uncertainty quantified at every level [@wikleHierarchicalModelsEnvironmental2003]. In particular, Bayesian spatio-temporal models account for the spatial autocorrelation in the data through spatial random effects, temporal effects account for the time-dependency of the data, time-varying covariates model the uncertainty attributable to measured confounders, and space-time interaction effects model the additional variation unaccounted for by the random effects [@Khana2018]. These models can borrow strength both spatial and temporally [@Khana2018] 
+Many researchers acknowledge the necessity of a hierarchical approach to modeling public health data [@brewerDoesNeighborhoodSocial2017; @Liu2007a; @Uejio2011; @williamsSocialDeterminantsTaking2009; @bestComparisonBayesianSpatial2005]. Individuals are nested within neighborhoods which are nested in urban areas. The levels of the hierarchy interact with higher and lower levels in systematic ways, where the higher levels act as constraints and the lower levels as noise [@costanzaModelingComplexEcological1993a]. Failure to model the non-linear variability in the lower levels can lead to significant aggregation error [@costanzaModelingComplexEcological1993a]. Furthermore, hierarchical models simplify complicated systems by separating joint distributions of covariates into separate conditional models which are linked by probability rules with uncertainty quantified at every level [@wikleHierarchicalModelsEnvironmental2003]. When analyzing a phenomena in both space and time it is important to note that there may be different spatial effects at different points in time and different temporal effects in different locations in space [@wikleHierarchicalBayesianSpacetime1998]. Bayesian spatio-temporal models implemented in a hierarchical framework permit the incorporation of space-time interactions at different levels in the hierarchical structure as well allowing high dimensionality [@wikleHierarchicalBayesianSpacetime1998]. In particular, Bayesian spatio-temporal models account for the spatial autocorrelation in the data through spatial random effects, temporal effects account for the time-dependency of the data, time-varying covariates model the uncertainty attributable to measured confounders, and space-time interaction effects model the additional variation unaccounted for by the random effects [@Khana2018]. These models can borrow strength both spatial and temporally [@Khana2018] accounting for the relative rarity of occurrence in space-time (census tract per day).
 
-Bayes' theorem is expressed as:
-$$ 
+Bayesian methods make explicit use of probability distributions to quantify inferential uncertainty. They also make use of expert knowledge through the specification of prior distributions for the estimated parameters. These priors are then conditioned on the observed data resulting in posterior estimates of the parameter distributions. These distributions can be considered intervals with a high probability of containing the quantity of interest, an advantage over the frequentist paradigm that interprets confidence intervals only in relation to a repeated series of similar trials [@gelmanBayesianDataAnalysis2013]. Bayesian inference is underwritten by Baye's theorem:
+
+\begin{equation}
 \underbrace{p(\theta|data)}_\text{posterior}\propto\underbrace{p(data|\theta)}_\text{likelihood}\times\underbrace{p(\theta)}_\text{prior}
-$$
+(\#eq:bayes)
+\end{equation}
+
 which states that the probability of a parameter given the data is proportional to the probability of the data conditioned on the parameter multiplied by the marginal probability for the parameter. In other words, the posterior distribution is the the prior distribution weighted by the observed data. If there are $G$ groups of observations:
-$$
+
+\begin{equation}
 y_{ig}\sim{Q(\theta_g)}
-$$
+(\#eq:groups)
+\end{equation}
+
 where $Q$ is the distribution of the observations within the groups each with its own parameter $\theta_g$. 
-$$
+
+\begin{equation}
 \theta_g\sim{W(\gamma)}
-$$
+(\#eq:group-param)
+\end{equation}
+
 where $W$ is the common distribution of $\theta_g$ with parameter $\gamma$, also known as the hyperparameter also with its own distribution. Taken together the posterior distribution for all the unknown parameters is:
-$$
+
+\begin{equation}
 p(\gamma, \theta|y) \propto p(y|\theta, \gamma)p(\theta|\gamma)p(\gamma)
-$$
+(\#eq:posterior)
+\end{equation}
+
 where $p(\theta|\gamma)p(\gamma)$ is the marginal joint distribution for the two parameters. The posterior distribution for the hyperparameter $\gamma$ is given by its marginal distribution:
-$$
+
+\begin{equation}
 p(\gamma|y) \propto \int p(y|\theta, \gamma)p(\theta|\gamma)p(\gamma)d\theta
-$$
+(\#eq:post-hyper)
+\end{equation}
+
 where the integration is accomplished stochastically through Markov chain Monte Carlo (MCMC) sampling from the conditional posterior distributions of the parameters [@lynchIntroductionAppliedBayesian2007].
 
 An advantage of a Bayesian MCMC approach over maximum likelihood methods is that the group-level parameters are estimated in the model rather than considering them part of the error term. Not only does this provide measures of uncertainty of the random effects, it enables exploring the structure of the random effects  [@burknerBrmsPackageBayesian2017; @miaouRoadwayTrafficCrash2003]. A hierarchical Bayes model would allow the modeling of spatial random effects, i.e. differences in the relationship between the covariates and pediatric asthma incidence between census tracts. Additionally, due to the low count of incidence per individual census tract, there is a large variability between analysis units that can make simple estimates unreliable. The small geographical and temporal resolution produces data that is sparse by nature, posing statistical problems of observational noise corrupting the signal of interest [@bestComparisonBayesianSpatial2005]. Hierarchical Bayes models with spatial random effects can account for this high variance and reveal geographic patterns in the data [@miaouRoadwayTrafficCrash2003]. These models utilize information from surrounding areas, thus borrowing strength in order to produce smoothed estimates for the individual census tracts, preserving geographic resolution while producing stable estimates [@ghoshHierarchicalBayesGLMs1999; @bestComparisonBayesianSpatial2005]. The individual parameter values of the tracts shrink towards a value defined by the distribution of all of the tracts in the hierarchical structure [@bestComparisonBayesianSpatial2005]. Additionally, the structured heterogeneity of spatial correlation between neighboring census tracts can be specified [@ghoshHierarchicalBayesGLMs1999]. 
