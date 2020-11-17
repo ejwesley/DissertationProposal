@@ -50,14 +50,14 @@ where $Q$ is the distribution of the observations within the groups each with it
 (\#eq:group-param)
 \end{equation}
 
-where $W$ is the common distribution of $\theta_g$ with parameter $\gamma$, also known as the hyperparameter also with its own distribution. Taken together the posterior distribution for all the unknown parameters is:
+where $W$ is the  distribution of the group parameters $\theta_g$ defined by parameter $\gamma$, also known as the hyperparameter. The hyperparameter also has its own distribution. Taken together the posterior distribution for all the unknown parameters is:
 
 \begin{equation}
 p(\gamma, \theta|y) \propto p(y|\theta, \gamma)p(\theta|\gamma)p(\gamma)
 (\#eq:posterior)
 \end{equation}
 
-where $p(\theta|\gamma)p(\gamma)$ is the marginal joint distribution for the two parameters. The posterior distribution for the hyperparameter $\gamma$ is given by its marginal distribution:
+where $p(\theta|\gamma)p(\gamma)$ is the marginal joint distribution for the two parameters. The posterior distribution for the hyperparameter $\gamma$ that governs the group-level paramters is given by its marginal distribution:
 
 \begin{equation}
 p(\gamma|y) \propto \int p(y|\theta, \gamma)p(\theta|\gamma)p(\gamma)d\theta
