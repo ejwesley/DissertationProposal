@@ -1,12 +1,7 @@
 # Preliminary analysis {#prelim}
 
-Some preliminary analysis highlights some of the limitations and challenges. The asthma data are characterized by weekly and seasonal trends that must be accounted for (Fig. \@ref(fig:acf)). Additionally, the asthma data is nonstationary with counts increasing every year (Fig. \@ref(fig:ann-counts)).
+Some preliminary analysis highlights some of the limitations and challenges. The asthma data are characterized by both 7-day and seasonal trends (Fig. \@ref(fig:acf)). 7-day trends are likely due to behavioral factors relating to doctor's visits while the seasonal trends may be related to allergens and prevalence of other seasonal respiratory exacerbations. Additionally, the asthma data is nonstationary, with counts increasing every year (Fig. \@ref(fig:ann-counts)). This may be due to an increase in occurrence rate or an increase in the number of children in the metro area. 
 
-```{r acf, fig.cap=cap}
-include_graphics("images/acf.png")
-
-cap <- "The autocorrelation function shows the weekly and seasonal trends in the asthma data."
-```
 
 ```{r ann-counts, fig.cap=cap}
 include_graphics("images/monthly_counts.pdf")
@@ -14,21 +9,21 @@ include_graphics("images/monthly_counts.pdf")
 cap = "Asthma counts are increasing every year."
 ```
 
-These trends are lessened when considering only the level 3 severity but this limits statistical power and level 2 severity is also considered an acute care visit (Fig. \@ref(fig:trend-sev)).
+The annual and 7-day trends are lessened when considering only the most severe observations, however this may limit statistical power. Additionally, level 2 severity observations are also considered acute care visits (Fig. \@ref(fig:trend-sev)). As noted in @\ref(asthma-data), the majority of both level-2 and level-3 severity are likely to be captured by the CMH network. These trends need to be accounted for in the statistical modeling or the relationships between variables of interest may be obscured. Possible techniques include decomposing the time signal and removing the seasonal and 7-day trends and calculating the occurrence rate from the American Community Survey 1-year estimates of number of children under 18 per census tract.
 
 ```{r trend-sev, fig.cap=cap, fig.show = "hold", out.width = "50%", fig.align = "default"}
 include_graphics("images/monthly_counts_severity.pdf")
 include_graphics("images/wday_counts_severity.pdf")
 
-cap <-  "Level 3 severity is less influenced by trends."
+cap <-  "Level 3 severity is less influenced by both seasonal and 7-day trends."
 ```
 
-Regardless of trends, there are clear anomalies that should be investigated (Fig. \@ref(fig:anomalies)).
+Regardless of trends, there are clear anomalies that should be investigated, including spikes in September and October of 2000, 2005, 2009, and 2012 with 2012 showing a particularly distinct peak compared to the rest of the year (Fig. \@ref(fig:anomalies)).
 
 ```{r anomalies, fig.cap=cap}
 include_graphics("images/avg_count.pdf")
 
-cap <- "Daily counts by year with 12-year average. There are clear anomalous asthma events."
+cap <- "Daily counts by year with 12-year average, vertical axes vary. Anomalies in the asthma counts will be investigated."
 ```
 
 ```{r setup, include = FALSE, cache = FALSE}
