@@ -11,6 +11,8 @@ header-includes:
    - \usepackage{lineno}
    - \linenumbers
 bibliography: Dissertation-Proposal.bib  
+biblio-style: apalike
+link-citations: yes
 linestretch: 2
 indent: true
 ---

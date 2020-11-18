@@ -9,7 +9,7 @@ include_graphics("images/monthly_counts.pdf")
 cap = "Asthma counts are increasing every year."
 ```
 
-The annual and 7-day trends are lessened when considering only the most severe observations, however this may limit statistical power. Additionally, level 2 severity observations are also considered acute care visits (Fig. \@ref(fig:trend-sev)). As noted in @\ref(asthma-data), the majority of both level-2 and level-3 severity are likely to be captured by the CMH network. These trends need to be accounted for in the statistical modeling or the relationships between variables of interest may be obscured. Possible techniques include decomposing the time signal and removing the seasonal and 7-day trends and calculating the occurrence rate from the American Community Survey 1-year estimates of number of children under 18 per census tract.
+The annual and 7-day trends are lessened when considering only the most severe observations, however this may limit statistical power. Additionally, level 2 severity observations are also considered acute care visits (Fig. \@ref(fig:trend-sev)). As noted in \@ref(asthma-data), the majority of both level-2 and level-3 severity are likely to be captured by the CMH network. These trends need to be accounted for in the statistical modeling or the relationships between variables of interest may be obscured. Possible techniques include decomposing the time signal and removing the seasonal and 7-day trends and calculating the occurrence rate from the American Community Survey 1-year estimates of number of children under 18 per census tract.
 
 ```{r trend-sev, fig.cap=cap, fig.show = "hold", out.width = "50%", fig.align = "default"}
 include_graphics("images/monthly_counts_severity.pdf")
