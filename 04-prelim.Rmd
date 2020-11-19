@@ -1,6 +1,6 @@
 # Preliminary analysis {#prelim}
 
-Some preliminary analysis highlights some of the limitations and challenges. The asthma data are characterized by both 7-day and seasonal trends (Fig. \@ref(fig:acf)). 7-day trends are likely due to behavioral factors relating to doctor's visits while the seasonal trends may be related to allergens and prevalence of other seasonal respiratory exacerbations. Additionally, the asthma data is nonstationary, with counts increasing every year (Fig. \@ref(fig:ann-counts)). This may be due to an increase in occurrence rate or an increase in the number of children in the metro area. 
+Some preliminary analysis highlights some of the limitations and challenges. The asthma data are characterized by both 7-day and seasonal trends (Fig. \@ref(trend-sev)). While the 7-day trends are likely due to behavioral factors relating to doctor's visits, the seasonal trends may be related to allergens and prevalence of other seasonal respiratory exacerbations. Additionally, the asthma data is nonstationary, with counts increasing every year (Fig. \@ref(fig:ann-counts)). This may be due to an increase in occurrence rate or an increase in the number of children in the metro area. 
 
 
 ```{r ann-counts, fig.cap=cap}
@@ -9,7 +9,7 @@ include_graphics("images/monthly_counts.pdf")
 cap = "Asthma counts are increasing every year."
 ```
 
-The annual and 7-day trends are lessened when considering only the most severe observations, however this may limit statistical power. Additionally, level 2 severity observations are also considered acute care visits (Fig. \@ref(fig:trend-sev)). As noted in \@ref(asthma-data), the majority of both level-2 and level-3 severity are likely to be captured by the CMH network. These trends need to be accounted for in the statistical modeling or the relationships between variables of interest may be obscured. Possible techniques include decomposing the time signal and removing the seasonal and 7-day trends and calculating the occurrence rate from the American Community Survey 1-year estimates of number of children under 18 per census tract.
+The annual and 7-day trends are less pronounces when considering only the level-3 observations, however this may limit statistical power. Additionally, level-2 observations are also considered acute care visits (Fig. \@ref(fig:trend-sev)). As noted in Section \@ref(asthma-data), the majority of both the level-2 and level-3 observations are likely to be captured by the CMH network. These trends need to be accounted for in the statistical modeling or the relationships between the variables of interest may be obscured. Possible techniques include decomposing the time signal and removing the seasonal and 7-day trends and calculating the occurrence rate from the American Community Survey 1-year estimates of number of children under 18 per census tract. It may also be possible to directly account for the temporal variation in the model.
 
 ```{r trend-sev, fig.cap=cap, fig.show = "hold", out.width = "50%", fig.align = "default"}
 include_graphics("images/monthly_counts_severity.pdf")
@@ -18,173 +18,15 @@ include_graphics("images/wday_counts_severity.pdf")
 cap <-  "Level 3 severity is less influenced by both seasonal and 7-day trends."
 ```
 
-Regardless of trends, there are clear anomalies that should be investigated, including spikes in September and October of 2000, 2005, 2009, and 2012 with 2012 showing a particularly distinct peak compared to the rest of the year (Fig. \@ref(fig:anomalies)).
+Regardless of trends, there are clear anomalies that should be investigated, including spikes in September and October of 2000, 2005, 2009, and 2012, with 2012 showing a particularly distinct peak compared to the rest of the year (Fig. \@ref(fig:anomalies)). These asthma events may be tied to climatic events.
 
 ```{r anomalies, fig.cap=cap}
 include_graphics("images/avg_count.pdf")
 
-cap <- "Daily counts by year with 12-year average, vertical axes vary. Anomalies in the asthma counts will be investigated."
-```
-
-```{r setup, include = FALSE, cache = FALSE}
-# knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
-# # Read in data from Load_data.R in scripts folder
-# 
-# source(here("scripts", "Load_data.R"), local = knitr::knit_global())
+cap <- "Daily counts by year with 12-year average, vertical axes vary. Distinct anomalies in 2000, 2005, 2009, and 2012."
 ```
 
 
-
-
-
-```{r include=F}
-# Count or rate? Comparing mean and variance for both.
-# all.levels %>% 
-#   group_by(GEOID10) %>% 
-#   summarise(mean = mean(count),
-#             var = var(count)) %>% 
-#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
-# ggplot() +
-#   geom_col(aes(x = GEOID10, y = value, color = Measure), position = position_dodge())
-# 
-# all.levels %>% 
-#   group_by(Date) %>% 
-#   summarise(mean = mean(count),
-#             var = var(count)) %>% 
-#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
-#   ggplot() +
-#   geom_line(aes(x = Date, y = value, color = Measure))
-# 
-# all.levels %>% 
-#   filter(count != 0) %>% 
-# ggplot() +
-#   geom_histogram(aes((count)))
-# 
-# all.levels %>% 
-#   group_by(Date) %>% 
-#   summarise(mean = mean(`Asthma rate`),
-#             var = var(`Asthma rate`)) %>% 
-#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
-#   ggplot() +
-#   geom_line(aes(x = Date, y = value, color = Measure))
-# 
-# all.levels %>% 
-#   group_by(GEOID10) %>% 
-#   summarise(mean = mean(`Asthma rate`),
-#             var = var(`Asthma rate`)) %>% 
-#   pivot_longer(cols = 2:3, names_to = "Measure") %>% 
-# ggplot() +
-#   geom_col(aes(x = GEOID10, y = value, color = Measure), position = position_dodge())
-# 
-# all.levels %>% 
-#   filter(count != 0) %>% 
-# ggplot() +
-#   geom_histogram(aes((`Asthma rate`)))
-```
-```{r include = F}
-# ggplot(all.levels) +
-#   geom_boxplot(aes(`Pct minority`, factor(count)))
-# 
-# ggplot(all.levels) +
-#   geom_point(aes(`Pct minority`, `Asthma rate`))
-# 
-# ggplot(all.levels) +
-#   geom_boxplot(aes(mean.imp, factor(count)))
-# 
-# ggplot(all.levels) +
-#   geom_point(aes(mean.imp, `Asthma rate`))
-# 
-# ggplot(all.levels) +
-#   geom_point(aes(mean.imp, `Pct minority`)) + 
-#   geom_smooth(aes(mean.imp, `Pct minority`), method = "lm")
-# 
-# ggplot(all.levels) +
-#   geom_point(aes(mean.imp, `Median LST`)) + 
-#   geom_smooth(aes(mean.imp, `Median LST`), method = "lm")
-# 
-# ggplot(all.levels) +
-#   geom_boxplot(aes(`Median LST`, factor(count)))
-```
-
-
-
-```{r LST-pctmin-quant, fig.cap = cap, echo = F}
-# Plot of LST over time by quantile of pct minority
-
-# all.levels %>%
-#   group_by(q, Date) %>% 
-#   mutate(m = median(`Median LST`)) %>% 
-#   ungroup() %>% 
-#   ggplot() +
-#   geom_line(aes(Date, m, color = q)) +
-#   ylab("Median LST per census tract") +
-#   facet_wrap(~ month(Date), scales = "free", ncol = 1)
-# 
-# cap <- "Median LST per census tract, summer 2010, by quantiles of percent minority residents."
-```
-
-
-```{r LST-count,  fig.cap = cap}
-# Plot asthma rate by LST, not including rows with NAs
-# all.levels %>% 
-#   drop_na() %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Median LST`, `Asthma rate`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap <- "Daily pediatric asthma count by median daily LST"
-```
-
-```{r min-count, fig.cap = cap}
-# all.levels %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Pct minority`, `Asthma rate`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap = "Daily pediatric asthma count by percent minority"
-```
-
-```{r imp-count, fig.cap = cap}
-# all.levels %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Mean pct impervious`, `Asthma rate`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap = "Daily pediatric asthma count by mean percent impervious land cover"
-```
-
-```{r lst-imp, fig.cap = cap}
-# all.levels %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Mean pct impervious`, `Median LST`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap = "Daily median LST by mean percent impervious land cover"
-```
-
-```{r lst-min, fig.cap = cap}
-# all.levels %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Median LST`, `Pct minority`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap = "Percent minority by daily median LST"
-```
-
-```{r imp-min, fig.cap = cap}
-# all.levels %>% 
-#   filter(`Asthma rate` > 0) %>% 
-#   ggplot(aes(`Mean pct impervious`, `Pct minority`)) +
-#   geom_bin2d() +
-#   geom_smooth(se = F, color = "red")
-# 
-# cap = "Percent minority by mean impervious land cover"
-```
 
 
 

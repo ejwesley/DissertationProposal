@@ -6,6 +6,8 @@ output:
   bookdown::pdf_document2:
      toc: false
      extra_dependencies: "subfig"
+     #citation_package: biblatex
+#classoption: draft # Removes figures for draft printing
 header-includes:
    - \usepackage{booktabs}
    - \usepackage{lineno}
