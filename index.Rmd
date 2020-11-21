@@ -1,23 +1,28 @@
 ---
-title: "Health and weather and stuff: A proposal"
-author: "Elizabeth Wesley"
+title: |
+  | \vspace{7cm} Health and weather, etc.: A proposal
+author: "Elizabeth Jane Wesley"
+date: November 2020
 site: bookdown::bookdown_site
 output:
   bookdown::pdf_document2:
      toc: false
      extra_dependencies: "subfig"
-     #citation_package: biblatex
+     citation_package: natbib
+natbiboptions: authoryear,round,sort
 #classoption: draft # Removes figures for draft printing
 header-includes:
    - \usepackage{booktabs}
    - \usepackage{lineno}
-   - \linenumbers
+   - \usepackage{setspace}
+   #- \usepackage[authoryear,round,sort]{natbib}
 bibliography: Dissertation-Proposal.bib  
-biblio-style: apalike
+biblio-style: "apalike"
 link-citations: yes
 linestretch: 2
 indent: true
 ---
+
 
 ```{r include = F}
 library(bookdown)
@@ -29,6 +34,44 @@ library(lubridate)
 knitr::opts_chunk$set(out.width="70%", fig.align='center', echo = F)
 ```
 
+\newpage
+
+\vspace*{5cm}
+
+
+\begin{singlespace}
+\begin{center}
+\emph{Las piedras del cielo}, \textbf{XXVIII} \\
+\bigskip
+\begin{tabular}{l}
+The square in the crystal falls \\
+back in its symmetry: \\
+those who open the doors of the earth \\
+will find in the darkness, intact and complete, \\
+the light of the system's transparency. \\
+\\
+The salt cube, the triangular \\
+fingers of quartz: the diamond's \\
+linear water: the maze \\
+in the sapphire and its gothic magnificence: \\
+the multiplication of rectangles \\
+in the nut of the amethyst: \\
+all wait for us under the ground: \\
+a whole buried geometry: \\
+the salt's school: the decorum of fire. 
+\end{tabular} \\
+\bigskip
+Pablo Neruda, 1970 \\
+
+\end{center}
+
+\end{singlespace}
+
+
+
+
+\newpage
+\linenumbers
 
 <!-- Chapters:
 01-intro
