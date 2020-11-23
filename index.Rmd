@@ -1,6 +1,6 @@
 ---
 title: |
-  | \vspace{7cm} Health and weather, etc.: A proposal
+  | \vspace{7cm} Health and weather, etcetera: A proposal
 author: "Elizabeth Jane Wesley"
 date: November 2020
 site: bookdown::bookdown_site
